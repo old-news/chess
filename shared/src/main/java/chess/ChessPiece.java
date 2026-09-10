@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -52,5 +54,44 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
+    }
+
+    public String toString() {
+        String retval = "";
+        switch (type) {
+            case PAWN:
+                retval = "p";
+                break;
+            case ROOK:
+                retval = "r";
+                break;
+            case KNIGHT:
+                retval = "n";
+                break;
+            case BISHOP:
+                retval = "b";
+                break;
+            case QUEEN:
+                retval = "q";
+                break;
+            case KING:
+                retval = "k";
+                break;
+        }
+        if (color == ChessGame.TeamColor.WHITE) {
+            retval = retval.toUpperCase();
+        }
+        return retval;
+    }
+
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (null == other) return false;
+        if (!getClass().equals(other.getClass())) return false;
+        return toString().equals(other.toString());
+    }
+
+    public int hashCode() {
+        return (int) toString().charAt(0);
     }
 }

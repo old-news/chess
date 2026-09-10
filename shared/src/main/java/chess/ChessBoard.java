@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.Arrays;
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -11,7 +12,6 @@ public class ChessBoard {
 	private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-//        resetBoard();
         return;
     }
 
@@ -61,48 +61,44 @@ public class ChessBoard {
         board[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         board[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         board[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        this.print();
     }
 
-    public void print() {
-        System.out.println("┌────────┐");
-        for (int row = 7; row >= 0; row--) {
-            System.out.print("│");
-            for (int col = 0; col < 8; col++) {
-                if (null == board[row][col]) {
-                    System.out.print('.');
+    public String toString() {
+//        System.out.println("┌────────┐");
+        String retval = "";
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                var pos = new ChessPosition(row, col);
+                var piece = getPiece(pos);
+                if (null == piece) {
+                    retval += '.';
                     continue;
                 }
-                char toprint = ' ';
-                switch (board[row][col].getPieceType()) {
-                    case PAWN:
-                        toprint = 'p';
-                        break;
-                    case ROOK:
-                        toprint = 'r';
-                        break;
-                    case KNIGHT:
-                        toprint = 'n';
-                        break;
-                    case BISHOP:
-                        toprint = 'b';
-                        break;
-                    case QUEEN:
-                        toprint = 'q';
-                        break;
-                    case KING:
-                        toprint = 'k';
-                        break;
-                    default:
-                        toprint = 'u';
-                }
-                if (board[row][col].getTeamColor() == ChessGame.TeamColor.WHITE) {
-                    toprint = Character.toUpperCase(toprint);
-                }
-                System.out.print(toprint);
+                retval += piece.toString();
             }
-            System.out.println("│");
+            retval += '\n';
         }
-        System.out.println("└────────┘");
+        return retval;
+    }
+
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (null == other || getClass() != other.getClass()) return false;
+        return toString().equals(other.toString());
+    }
+
+    public int hashCode() {
+        int code = 0;
+        for (var row = 1; row <= 8; row++) {
+            for (var col = 1; col <= 8; col++) {
+                var pieceHash = 1;
+                var piece = getPiece(new ChessPosition(row, col));
+                if (null != piece) {
+                    pieceHash = piece.hashCode();
+                }
+                code += (row + 8*col) * pieceHash;
+            }
+        }
+        return code;
     }
 }
