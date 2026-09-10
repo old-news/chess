@@ -48,4 +48,22 @@ public class ChessMove {
         }
         return null;
     }
+
+    public String toString() {
+        String piecestr = "e";
+        if (null != movingPiece) {
+            piecestr = movingPiece.toString();
+        }
+        return piecestr + " " + startpos.toString() + " " + endpos.toString();
+    }
+
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (null == other || !getClass().equals(other.getClass())) return false;
+        return toString().equals(other.toString());
+    }
+
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }

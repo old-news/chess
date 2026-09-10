@@ -29,4 +29,18 @@ public class ChessPosition {
     public int getColumn() {
         return col;
     }
+
+    public String toString() {
+        return Integer.toString(row) + "," + Integer.toString(col);
+    }
+
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (null == other || !getClass().equals(other.getClass())) return false;
+        return toString().equals(other.toString());
+    }
+
+    public int hashCode() {
+        return row + 8*col;
+    }
 }
