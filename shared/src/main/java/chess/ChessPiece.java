@@ -59,24 +59,32 @@ public class ChessPiece {
 //            throw new Exception("tried to get moves on empty board");
 //        }
         List<ChessPosition> positions = new ArrayList<>();
-        switch(type) {
+        List<ChessMove> moves = new ArrayList<>();
+        switch (type) {
             case PAWN -> {
-                positions = getPawnPotentialMovePositions(board, myPosition);
+                moves = getPawnLegalMoves(board, myPosition);
             }
         }
-        List<ChessMove> moves = new ArrayList<>();
         for (ChessPosition pos : positions) {
-            moves.add(new ChessMove(myPosition, pos, type));
+            moves.add(new ChessMove(myPosition, pos, null));
         }
         return moves;
     }
 
-    private List<ChessPosition> getPawnPotentialMovePositions(ChessBoard board, ChessPosition myPosition) {
+    private List<ChessMove> getPawnLegalMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessPosition> positions = new ArrayList<>();
         int rowDir = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
         ChessPosition frontPos = myPosition.plussed(rowDir, 0);
         if (null == board.getPiece(frontPos)) {
             positions.add(frontPos);
+            ChessPosition front2Pos = myPosition.plussed(rowDir*2, 0);
+            if (null == board.getPiece(front2Pos)) {
+                if (rowDir == 1 && myPosition.getRow() == 2) {
+                    positions.add(front2Pos);
+                } else if (rowDir == -1 && myPosition.getRow() == 7) {
+                    positions.add(front2Pos);
+                }
+            }
         }
         ChessPosition leftPos = myPosition.plussed(rowDir, -1);
         if (null != board.getPiece(leftPos) && color != board.getPiece(leftPos).getTeamColor()) {
@@ -86,7 +94,18 @@ public class ChessPiece {
         if (null != board.getPiece(rightPos) && color != board.getPiece(rightPos).getTeamColor()) {
             positions.add(rightPos);
         }
-        return positions;
+        List<ChessMove> moves = new ArrayList<>();
+        for (var pos : positions) {
+            if (pos.getRow() < myPosition.getRow() && pos.getRow() == 1 || pos.getRow() > myPosition.getRow() && pos.getRow() == 8) {
+                moves.add(new ChessMove(myPosition, pos, PieceType.QUEEN));
+                moves.add(new ChessMove(myPosition, pos, PieceType.BISHOP));
+                moves.add(new ChessMove(myPosition, pos, PieceType.ROOK));
+                moves.add(new ChessMove(myPosition, pos, PieceType.KNIGHT));
+            } else {
+                moves.add(new ChessMove(myPosition, pos, null));
+            }
+        }
+        return moves;
     }
 
     public String toString() {
