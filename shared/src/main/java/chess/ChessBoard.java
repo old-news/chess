@@ -101,4 +101,13 @@ public class ChessBoard {
         }
         return code;
     }
+
+    public boolean empty() {
+        for (var row : board) {
+            for (var val : board) {
+                if (null != val) return false;
+            }
+        }
+        return true;
+    }
 }

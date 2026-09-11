@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -53,7 +55,38 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+//        if (board.empty()) {
+//            throw new Exception("tried to get moves on empty board");
+//        }
+        List<ChessPosition> positions = new ArrayList<>();
+        switch(type) {
+            case PAWN -> {
+                positions = getPawnPotentialMovePositions(board, myPosition);
+            }
+        }
+        List<ChessMove> moves = new ArrayList<>();
+        for (ChessPosition pos : positions) {
+            moves.add(new ChessMove(myPosition, pos, type));
+        }
+        return moves;
+    }
+
+    private List<ChessPosition> getPawnPotentialMovePositions(ChessBoard board, ChessPosition myPosition) {
+        List<ChessPosition> positions = new ArrayList<>();
+        int rowDir = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
+        ChessPosition frontPos = myPosition.plussed(rowDir, 0);
+        if (null == board.getPiece(frontPos)) {
+            positions.add(frontPos);
+        }
+        ChessPosition leftPos = myPosition.plussed(rowDir, -1);
+        if (null != board.getPiece(leftPos) && color != board.getPiece(leftPos).getTeamColor()) {
+            positions.add(leftPos);
+        }
+        ChessPosition rightPos = myPosition.plussed(rowDir, 1);
+        if (null != board.getPiece(rightPos) && color != board.getPiece(rightPos).getTeamColor()) {
+            positions.add(rightPos);
+        }
+        return positions;
     }
 
     public String toString() {

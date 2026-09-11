@@ -43,4 +43,8 @@ public class ChessPosition {
     public int hashCode() {
         return row + 8*col;
     }
+
+    public ChessPosition plussed(int rowadj, int coladj) {
+        return new ChessPosition(Math.clamp(row + rowadj, 1, 8), Math.clamp(col + coladj, 1, 8));
+    }
 }
