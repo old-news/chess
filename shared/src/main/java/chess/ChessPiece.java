@@ -67,8 +67,12 @@ public class ChessPiece {
             case KING -> {
                 positions = getKingLegalMovePositions(board, myPosition);
             }
+            case KNIGHT -> {
+                positions = getKnightLegalMovePositions(board, myPosition);
+            }
         }
         for (ChessPosition pos : positions) {
+            if (!pos.isInBounds()) continue;
             moves.add(new ChessMove(myPosition, pos, null));
         }
         return moves;
@@ -124,6 +128,27 @@ public class ChessPiece {
                 {-1, -1}
         };
         for (var adj : adjustments) {
+            var pos = myPosition.plussed(adj[0], adj[1]);
+            if (board.getPiece(pos) == null || board.getPiece(pos).color != color) {
+                positions.add(pos);
+            }
+        }
+        return positions;
+    }
+
+    private List<ChessPosition> getKnightLegalMovePositions(ChessBoard board, ChessPosition myPosition) {
+        List<ChessPosition> positions = new ArrayList<>();
+        int[][] adjs = new int[][]{
+                {1, 2},
+                {1, -2},
+                {-1, 2},
+                {-1, -2},
+                {2, 1},
+                {2, -1},
+                {-2, 1},
+                {-2, -1}
+        };
+        for (var adj : adjs) {
             var pos = myPosition.plussed(adj[0], adj[1]);
             if (board.getPiece(pos) == null || board.getPiece(pos).color != color) {
                 positions.add(pos);

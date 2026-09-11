@@ -45,6 +45,10 @@ public class ChessPosition {
     }
 
     public ChessPosition plussed(int rowadj, int coladj) {
-        return new ChessPosition(Math.clamp(row + rowadj, 1, 8), Math.clamp(col + coladj, 1, 8));
+        return new ChessPosition(row + rowadj, col + coladj);
+    }
+
+    public boolean isInBounds() {
+        return (row <= 8 && row >= 1 && col <= 8 && col >= 1);
     }
 }
