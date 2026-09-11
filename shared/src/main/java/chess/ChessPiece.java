@@ -62,13 +62,16 @@ public class ChessPiece {
         List<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case PAWN -> {
-                moves = getPawnLegalMoves(board, myPosition);
+                moves = getPawnMoves(board, myPosition);
             }
             case KING -> {
-                positions = getKingLegalMovePositions(board, myPosition);
+                positions = getKingMovePositions(board, myPosition);
             }
             case KNIGHT -> {
-                positions = getKnightLegalMovePositions(board, myPosition);
+                positions = getKnightMovePositions(board, myPosition);
+            }
+            case ROOK -> {
+                positions = getRookMovePositions(board, myPosition);
             }
         }
         for (ChessPosition pos : positions) {
@@ -78,7 +81,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private List<ChessMove> getPawnLegalMoves(ChessBoard board, ChessPosition myPosition) {
+    private List<ChessMove> getPawnMoves(ChessBoard board, ChessPosition myPosition) {
         List<ChessPosition> positions = new ArrayList<>();
         int rowDir = (color == ChessGame.TeamColor.WHITE) ? 1 : -1;
         ChessPosition frontPos = myPosition.plussed(rowDir, 0);
@@ -115,7 +118,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private List<ChessPosition> getKingLegalMovePositions(ChessBoard board, ChessPosition myPosition) {
+    private List<ChessPosition> getKingMovePositions(ChessBoard board, ChessPosition myPosition) {
         List<ChessPosition> positions = new ArrayList<>();
         int[][] adjustments = new int[][] {
                 {0, 1},
@@ -136,7 +139,7 @@ public class ChessPiece {
         return positions;
     }
 
-    private List<ChessPosition> getKnightLegalMovePositions(ChessBoard board, ChessPosition myPosition) {
+    private List<ChessPosition> getKnightMovePositions(ChessBoard board, ChessPosition myPosition) {
         List<ChessPosition> positions = new ArrayList<>();
         int[][] adjs = new int[][]{
                 {1, 2},
@@ -153,6 +156,35 @@ public class ChessPiece {
             if (board.getPiece(pos) == null || board.getPiece(pos).color != color) {
                 positions.add(pos);
             }
+        }
+        return positions;
+    }
+
+    private List<ChessPosition> getRookMovePositions(ChessBoard board, ChessPosition myPosition) {
+        List<ChessPosition> positions = new ArrayList<>();
+        for (int i = 1; myPosition.getColumn()+i <= 8; i++) {
+            var pos = myPosition.plussed(0, i);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = -1; myPosition.getColumn()+i >= 1; i--) {
+            var pos = myPosition.plussed(0, i);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = 1; myPosition.getRow()+i <= 8; i++) {
+            var pos = myPosition.plussed(i, 0);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = -1; myPosition.getRow()+i >= 1; i--) {
+            var pos = myPosition.plussed(i, 0);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
         }
         return positions;
     }
