@@ -76,6 +76,9 @@ public class ChessPiece {
             case BISHOP -> {
                 positions = getBishopMovePositions(board, myPosition);
             }
+            case QUEEN -> {
+                positions = getQueenMovePositions(board, myPosition);
+            }
         }
         for (ChessPosition pos : positions) {
             if (!pos.isInBounds()) continue;
@@ -218,6 +221,15 @@ public class ChessPiece {
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
         }
+        return positions;
+    }
+
+    private List<ChessPosition> getQueenMovePositions(ChessBoard board, ChessPosition myPosition) {
+        List<ChessPosition> positions = new ArrayList<>();
+        List<ChessPosition> rookishPositions = getRookMovePositions(board, myPosition);
+        List<ChessPosition> bishopishPositions = getBishopMovePositions(board, myPosition);
+        positions.addAll(rookishPositions);
+        positions.addAll(bishopishPositions);
         return positions;
     }
 
