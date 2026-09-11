@@ -73,6 +73,9 @@ public class ChessPiece {
             case ROOK -> {
                 positions = getRookMovePositions(board, myPosition);
             }
+            case BISHOP -> {
+                positions = getBishopMovePositions(board, myPosition);
+            }
         }
         for (ChessPosition pos : positions) {
             if (!pos.isInBounds()) continue;
@@ -182,6 +185,35 @@ public class ChessPiece {
         }
         for (int i = -1; myPosition.getRow()+i >= 1; i--) {
             var pos = myPosition.plussed(i, 0);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        return positions;
+    }
+
+    private List<ChessPosition> getBishopMovePositions(ChessBoard board, ChessPosition myPosition) {
+        List<ChessPosition> positions = new ArrayList<>();
+        for (int i = 1; i+myPosition.getRow() <= 8 && i+myPosition.getColumn() <= 8; i++) {
+            var pos = myPosition.plussed(i, i);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = 1; myPosition.getRow()-i >= 1 && i+myPosition.getColumn() <= 8; i++) {
+            var pos = myPosition.plussed(-i, i);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = 1; i+myPosition.getRow() <= 8 && myPosition.getColumn()-i >= 1; i++) {
+            var pos = myPosition.plussed(i, -i);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
+            positions.add(pos);
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
+        }
+        for (int i = 1; myPosition.getRow()-i >= 1 && myPosition.getColumn()-i >= 1; i++) {
+            var pos = myPosition.plussed(-i, -i);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == color) break;
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != color) break;
