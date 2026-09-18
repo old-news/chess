@@ -95,6 +95,6 @@ public class ChessPiece {
     }
 
     public int hashCode() {
-        return (int) toString().charAt(0);
+        return toString().hashCode();
     }
 }

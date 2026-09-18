@@ -22,6 +22,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
+        if (!position.isInBounds()) return;
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
@@ -33,9 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        if (position.getRow() > 8 || position.getRow() < 1 || position.getColumn() > 8 || position.getColumn() < 1) {
-            return null;
-        }
+        if (!position.isInBounds()) return null;
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
@@ -95,18 +94,7 @@ public class ChessBoard {
     }
 
     public int hashCode() {
-        int code = 0;
-        for (var row = 1; row <= 8; row++) {
-            for (var col = 1; col <= 8; col++) {
-                var pieceHash = 0;
-                var piece = getPiece(new ChessPosition(row, col));
-                if (null != piece) {
-                    pieceHash = piece.hashCode();
-                }
-                code += (row + 8*col) * pieceHash;
-            }
-        }
-        return code;
+        return toString().hashCode();
     }
 
     public boolean empty() {
