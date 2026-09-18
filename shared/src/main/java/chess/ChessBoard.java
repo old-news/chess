@@ -38,6 +38,18 @@ public class ChessBoard {
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+    public ChessPosition search(ChessPiece piece) {
+        if (null == piece) return null;
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                var pos = new ChessPosition(row, col);
+                var otherPiece = getPiece(pos);
+                if (piece.equals(otherPiece)) return pos;
+            }
+        }
+        return null;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
@@ -104,5 +116,17 @@ public class ChessBoard {
             }
         }
         return true;
+    }
+
+    public ChessBoard deepcopy() {
+        var newboard = new ChessBoard();
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                var pos = new ChessPosition(row, col);
+                var piece = getPiece(pos);
+                newboard.addPiece(pos, piece);
+            }
+        }
+        return newboard;
     }
 }

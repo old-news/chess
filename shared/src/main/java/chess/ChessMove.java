@@ -38,12 +38,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        if (endpos.getRow() > startpos.getRow() && endpos.getRow() == 8) {
-            return ChessPiece.PieceType.QUEEN;
-        } else if (endpos.getRow() < startpos.getRow() && endpos.getRow() == 1) {
-            return ChessPiece.PieceType.QUEEN;
-        }
-        return null;
+        return (null == promotionPiece) ? null : promotionPiece;
     }
 
     public String toString() {

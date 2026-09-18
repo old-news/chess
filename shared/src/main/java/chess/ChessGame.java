@@ -1,5 +1,7 @@
 package chess;
 
+import org.junit.platform.commons.util.BlacklistedExceptions;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -77,11 +79,43 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        System.out.println("makemove: " + move);
+        if (null == move) throw new InvalidMoveException("`null` move passed to ChessGame.makeMove");
         if (!move.getStartPosition().isInBounds()) throw new InvalidMoveException("Invalid start pos");
         if (!move.getEndPosition().isInBounds()) throw new InvalidMoveException("Invalid end pos");
-        var piece = board.getPiece(move.getStartPosition());
+        var startpos = move.getStartPosition();
+        var piece = board.getPiece(startpos);
+        if (null == piece) {
+            throw new InvalidMoveException("Tried to move from empty square");
+        }
+        if (piece.getTeamColor() != turn) {
+            throw new InvalidMoveException("Tried to move out of turn");
+        }
+        var validMoves = validMoves(startpos);
+        if (!validMoves.contains(move)) {
+            throw new InvalidMoveException("Invalid move for piece");
+        }
+        var wasInCheck = isInCheck(piece.getTeamColor());
         board.addPiece(move.getStartPosition(), null);
-        board.addPiece(move.getEndPosition(), piece);
+        if (null != move.getPromotionPiece()) {
+            var promotionPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+            board.addPiece(move.getEndPosition(), promotionPiece);
+        } else {
+            board.addPiece(move.getEndPosition(), piece);
+        }
+        turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        if (wasInCheck) {
+            if (isInCheck(piece.getTeamColor())) {
+                reverseMove(move);
+                throw new InvalidMoveException("Illegal move in check");
+            }
+        }
+    }
+
+    private void reverseMove(ChessMove move) {
+        var piece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getEndPosition(), null);
+        board.addPiece(move.getStartPosition(), piece);
     }
 
     /**
@@ -91,7 +125,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-
+        var enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        var enemyMoves = allValidTeamMoves(enemyColor);
+        var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+        var kingpos = board.search(teamKing);
+        for (var move : enemyMoves) {
+            var endpos = move.getEndPosition();
+            if (endpos.equals(kingpos)) return true;
+        }
+        return false;
     }
 
     /**
