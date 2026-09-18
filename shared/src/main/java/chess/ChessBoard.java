@@ -64,10 +64,14 @@ public class ChessBoard {
         board[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         board[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         board[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        for (int i = 2; i < 6; i++) {
+            for (int j = 0; j < 7; j++) {
+                board[i][j] = null;
+            }
+        }
     }
 
     public String toString() {
-//        System.out.println("┌────────┐");
         String retval = "";
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -94,7 +98,7 @@ public class ChessBoard {
         int code = 0;
         for (var row = 1; row <= 8; row++) {
             for (var col = 1; col <= 8; col++) {
-                var pieceHash = 1;
+                var pieceHash = 0;
                 var piece = getPiece(new ChessPosition(row, col));
                 if (null != piece) {
                     pieceHash = piece.hashCode();

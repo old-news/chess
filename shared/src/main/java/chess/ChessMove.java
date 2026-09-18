@@ -8,13 +8,13 @@ package chess;
  */
 public class ChessMove {
     private ChessPosition startpos, endpos;
-    private ChessPiece.PieceType movingPiece;
+    private ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         startpos = startPosition;
         endpos = endPosition;
-        movingPiece = promotionPiece;
+        this.promotionPiece = promotionPiece;
     }
 
     /**
@@ -38,9 +38,6 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        if (movingPiece != ChessPiece.PieceType.PAWN) {
-            return null;
-        }
         if (endpos.getRow() > startpos.getRow() && endpos.getRow() == 8) {
             return ChessPiece.PieceType.QUEEN;
         } else if (endpos.getRow() < startpos.getRow() && endpos.getRow() == 1) {
@@ -51,8 +48,8 @@ public class ChessMove {
 
     public String toString() {
         String piecestr = "e";
-        if (null != movingPiece) {
-            piecestr = movingPiece.toString();
+        if (null != promotionPiece) {
+            piecestr = promotionPiece.toString();
         }
         return piecestr + " " + startpos.toString() + " " + endpos.toString();
     }

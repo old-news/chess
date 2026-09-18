@@ -45,7 +45,6 @@ public abstract class EqualsTestingUtility<T> {
     @Test
     @DisplayName("Equals Testing")
     public void equalsTest() {
-        System.out.print(original.equals(equivalent));
         Assertions.assertEquals(original, equivalent,
                 className + ".equals() returned false for equivalent " + itemsPlural);
         for (var different : allDifferent) {
