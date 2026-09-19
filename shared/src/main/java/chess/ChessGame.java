@@ -56,7 +56,15 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var calculator = new ChessMoveCalculator(board);
         Collection<ChessMove> potentialMoves = calculator.getMoves(startPosition);
-        return potentialMoves;
+//        if (!isInCheck(turn)) return potentialMoves;
+        var pieceColor = board.getPiece(startPosition).getTeamColor();
+        Collection<ChessMove> movesWhichEscapeCheck = new ArrayList<>();
+        for (var move : potentialMoves) {
+            if (!moveEndsWithCheck(move)) {
+                movesWhichEscapeCheck.add(move);
+            }
+        }
+        return movesWhichEscapeCheck;
     }
 
     public Collection<ChessMove> allValidTeamMoves(TeamColor color) {
@@ -95,7 +103,9 @@ public class ChessGame {
         if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Invalid move for piece");
         }
-        var wasInCheck = isInCheck(piece.getTeamColor());
+        if (moveEndsWithCheck(move)) {
+            throw new InvalidMoveException("Illegal move in check");
+        }
         board.addPiece(move.getStartPosition(), null);
         if (null != move.getPromotionPiece()) {
             var promotionPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
@@ -104,18 +114,29 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), piece);
         }
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        if (wasInCheck) {
-            if (isInCheck(piece.getTeamColor())) {
-                reverseMove(move);
-                throw new InvalidMoveException("Illegal move in check");
-            }
-        }
+    }
+
+    public boolean moveEndsWithCheck(ChessMove move) {
+        var movingPiece = board.getPiece(move.getStartPosition());
+        var endpiece = board.getPiece(move.getEndPosition());
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), movingPiece);
+        var endedInCheck = isInCheck(movingPiece.getTeamColor());
+        board.addPiece(move.getStartPosition(), movingPiece);
+        board.addPiece(move.getEndPosition(), endpiece);
+        return endedInCheck;
     }
 
     private void reverseMove(ChessMove move) {
         var piece = board.getPiece(move.getEndPosition());
         board.addPiece(move.getEndPosition(), null);
         board.addPiece(move.getStartPosition(), piece);
+    }
+
+    public void makeMoveNoInvalidChecks(ChessMove move) {
+        var piece = board.getPiece(move.getStartPosition());
+        board.addPiece(move.getStartPosition(), null);
+        board.addPiece(move.getEndPosition(), piece);
     }
 
     /**
