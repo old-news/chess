@@ -7,8 +7,8 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
-    private ChessPosition startpos, endpos;
-    private ChessPiece.PieceType promotionPiece;
+    private final ChessPosition startpos, endpos;
+    private final ChessPiece.PieceType promotionPiece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -52,7 +52,7 @@ public class ChessMove {
     public boolean equals(Object other) {
         if (this == other) return true;
         if (null == other || !getClass().equals(other.getClass())) return false;
-        return toString().equals(other.toString());
+	return toString().equals(other.toString());
     }
 
     public int hashCode() {

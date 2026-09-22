@@ -198,12 +198,24 @@ public class ChessMoveCalculator {
         return positions;
     }
 
-    public Collection<ChessMove> getEnPassant(ChessPosition startpos, ChessMove lastmove) {
+    public ChessMove getEnPassant(ChessPosition startpos, ChessMove lastmove) {
 	    var piece = board.getPiece(startpos);
-	    if (null == piece || ChessPiece.PieceType.PAWN != piece.getPieceType()) return new ArrayList<>();
+	    if (null == piece || ChessPiece.PieceType.PAWN != piece.getPieceType()) return null;
 	    var color = piece.getTeamColor();
 	    int rowDir = (focusColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-	    if ((color == ChessGame.TeamColor.WHITE && startpos.getRow() != 5) || (color == ChessGame.TeamColor.BLACK && startpos.getColumn() != 5)) return new ArrayList<>();
-	    return new ArrayList<>();
+	    if ((color == ChessGame.TeamColor.WHITE && startpos.getRow() != 5) || (color == ChessGame.TeamColor.BLACK && startpos.getRow() != 4)) return null;
+	    var lastMovedPiece = board.getPiece(lastmove.getEndPosition());
+	    if (lastMovedPiece.getPieceType() != ChessPiece.PieceType.PAWN) return null;
+	    if (Math.abs(lastmove.getEndPosition().getRow() - lastmove.getStartPosition().getRow()) != 2) return null;
+	    if (Math.abs(startpos.getColumn() - lastmove.getEndPosition().getColumn()) != 1) return null;
+	    if ((lastMovedPiece.getTeamColor() == ChessGame.TeamColor.WHITE && lastmove.getStartPosition().getRow() != 2) ||
+		(lastMovedPiece.getTeamColor() == ChessGame.TeamColor.BLACK && lastmove.getStartPosition().getRow() != 7)
+	    ) {
+		    return null;
+	    }
+	    ChessPosition enPassantEnd = new ChessPosition(startpos.getRow() + rowDir, lastmove.getEndPosition().getColumn());
+	    ChessMove enPassantMove = new ChessMove(startpos, enPassantEnd, null);
+	    System.out.println("addded nps move");
+	    return enPassantMove;
     }
 }

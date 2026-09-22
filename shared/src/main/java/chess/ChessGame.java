@@ -58,14 +58,17 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var calculator = new ChessMoveCalculator(board);
         Collection<ChessMove> potentialMoves = calculator.getMoves(startPosition);
-	Collection<ChessMove> enPassantMoves = calculator.getEnPassant(startPosition, lastMove);
-	potentialMoves.addAll(enPassantMoves);
+	ChessMove enPassantMove = calculator.getEnPassant(startPosition, lastMove);
+	if (null != enPassantMove) {
+		potentialMoves.add(enPassantMove);
+	}
         Collection<ChessMove> movesWhichEscapeCheck = new ArrayList<>();
         for (var move : potentialMoves) {
             if (!moveEndsWithCheck(move)) {
                 movesWhichEscapeCheck.add(move);
             }
         }
+	System.out.println("valid moves: " + movesWhichEscapeCheck);
         return movesWhichEscapeCheck;
     }
 
@@ -118,7 +121,8 @@ public class ChessGame {
         if (moveEndsWithCheck(move)) {
             throw new InvalidMoveException("Illegal move in check");
         }
-        board.addPiece(move.getStartPosition(), null);
+	board.removePiece(move.getStartPosition());
+	var killedPiece = board.getPiece(move.getEndPosition());
         if (null != move.getPromotionPiece()) {
             var promotionPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
             board.addPiece(move.getEndPosition(), promotionPiece);
@@ -127,6 +131,19 @@ public class ChessGame {
         }
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         lastMove = move;
+	System.out.println("Making move: " + move);
+	var rowDir = move.getEndPosition().getRow() - move.getStartPosition().getRow();
+	var potentialEnPassantVictim = board.getPiece(move.getEndPosition().plussed(-rowDir, 0));
+	System.out.println(piece.getPieceType() == ChessPiece.PieceType.PAWN);
+	System.out.println(potentialEnPassantVictim != null);
+	if (potentialEnPassantVictim != null) {
+		System.out.println(potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN);
+	}
+	System.out.println(null == killedPiece);
+	if (piece.getPieceType() == ChessPiece.PieceType.PAWN && potentialEnPassantVictim != null && potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN && null == killedPiece) {
+		System.out.println("Removing piece due to enpassant");
+		board.removePiece(move.getEndPosition().plussed(-rowDir, 0));
+	}
     }
 
     public boolean moveEndsWithCheck(ChessMove move) {
