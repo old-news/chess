@@ -91,7 +91,7 @@ public class ChessBoard {
 
     public String toString() {
         String retval = "";
-        for (int row = 1; row <= 8; row++) {
+        for (int row = 8; row >= 1; row--) {
             for (int col = 1; col <= 8; col++) {
                 var pos = new ChessPosition(row, col);
                 var piece = getPiece(pos);

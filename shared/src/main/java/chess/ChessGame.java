@@ -67,7 +67,7 @@ public class ChessGame {
         return movesWhichEscapeCheck;
     }
 
-    private Collection<ChessMove> allValidTeamMoves(TeamColor color) {
+    private Collection<ChessMove> allTeamMoves(TeamColor color) {
         Collection<ChessMove> moves = new ArrayList<>();
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -78,6 +78,17 @@ public class ChessGame {
             }
         }
         return moves;
+    }
+
+    private Collection<ChessMove> allValidTeamMoves(TeamColor color) {
+	    Collection<ChessMove> moves = allTeamMoves(color);
+	    Collection<ChessMove> validMoves = new ArrayList<>();
+	    for (var move : moves) {
+		    if (!moveEndsWithCheck(move)) {
+			    validMoves.add(move);
+		    }
+	    }
+	    return validMoves;
     }
 
     /**
@@ -119,7 +130,7 @@ public class ChessGame {
     public boolean moveEndsWithCheck(ChessMove move) {
         var movingPiece = board.getPiece(move.getStartPosition());
         var endpiece = board.getPiece(move.getEndPosition());
-        board.addPiece(move.getStartPosition(), null);
+        board.removePiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), movingPiece);
         var endedInCheck = isInCheck(movingPiece.getTeamColor());
         board.addPiece(move.getStartPosition(), movingPiece);
@@ -129,13 +140,13 @@ public class ChessGame {
 
     private void reverseMove(ChessMove move) {
         var piece = board.getPiece(move.getEndPosition());
-        board.addPiece(move.getEndPosition(), null);
+        board.removePiece(move.getEndPosition());
         board.addPiece(move.getStartPosition(), piece);
     }
 
     public void makeMoveNoInvalidChecks(ChessMove move) {
         var piece = board.getPiece(move.getStartPosition());
-        board.addPiece(move.getStartPosition(), null);
+        board.removePiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
     }
 
@@ -147,7 +158,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         var enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        var enemyMoves = allValidTeamMoves(enemyColor);
+        var enemyMoves = allTeamMoves(enemyColor);
         var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
         var kingpos = board.search(teamKing);
         for (var move : enemyMoves) {
@@ -164,7 +175,10 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return allValidTeamMoves(teamColor).isEmpty();
+	    System.out.println(board.toString());
+	    System.out.println("Incheck: " + isInCheck(teamColor));
+	    System.out.println("valid team moves: " + allValidTeamMoves(teamColor));
+        return isInCheck(teamColor) && allValidTeamMoves(teamColor).isEmpty();
 //        throw new RuntimeException("Not implemented");
     }
 
@@ -177,7 +191,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         System.out.print(allValidTeamMoves(teamColor));
-        return allValidTeamMoves(teamColor).isEmpty();
+        return !isInCheck(teamColor) && allValidTeamMoves(teamColor).isEmpty();
     }
 
     /**
