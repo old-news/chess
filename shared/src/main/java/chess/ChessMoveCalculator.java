@@ -67,16 +67,13 @@ public class ChessMoveCalculator {
             }
         }
         ChessPosition leftFrontPos = startpos.plussed(rowDir, -1);
-        ChessPosition leftPos = startpos.plussed(0, -1);
-        if ((null != board.getPiece(leftFrontPos) && focusColor != board.getPiece(leftFrontPos).getTeamColor()) ||
-                (null != board.getPiece(leftPos) && focusColor != ChessGame.TeamColor.WHITE)
-        ) {
+        if (null != board.getPiece(leftFrontPos) && focusColor != board.getPiece(leftFrontPos).getTeamColor()) {
             positions.add(leftFrontPos);
         }
-        ChessPosition rightPos = startpos.plussed(rowDir, 1);
 
-        if (null != board.getPiece(rightPos) && focusColor != board.getPiece(rightPos).getTeamColor()) {
-            positions.add(rightPos);
+        ChessPosition rightFrontPos = startpos.plussed(rowDir, 1);
+        if (null != board.getPiece(rightFrontPos) && focusColor != board.getPiece(rightFrontPos).getTeamColor()) {
+            positions.add(rightFrontPos);
         }
         List<ChessMove> moves = new ArrayList<>();
         for (var pos : positions) {
@@ -199,5 +196,14 @@ public class ChessMoveCalculator {
         positions.addAll(rookishPositions);
         positions.addAll(bishopishPositions);
         return positions;
+    }
+
+    public Collection<ChessMove> getEnPassant(ChessPosition startpos, ChessMove lastmove) {
+	    var piece = board.getPiece(startpos);
+	    if (null == piece || ChessPiece.PieceType.PAWN != piece.getPieceType()) return new ArrayList<>();
+	    var color = piece.getTeamColor();
+	    int rowDir = (focusColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+	    if ((color == ChessGame.TeamColor.WHITE && startpos.getRow() != 5) || (color == ChessGame.TeamColor.BLACK && startpos.getColumn() != 5)) return new ArrayList<>();
+	    return new ArrayList<>();
     }
 }

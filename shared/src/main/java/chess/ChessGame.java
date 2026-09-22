@@ -58,6 +58,8 @@ public class ChessGame {
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         var calculator = new ChessMoveCalculator(board);
         Collection<ChessMove> potentialMoves = calculator.getMoves(startPosition);
+	Collection<ChessMove> enPassantMoves = calculator.getEnPassant(startPosition, lastMove);
+	potentialMoves.addAll(enPassantMoves);
         Collection<ChessMove> movesWhichEscapeCheck = new ArrayList<>();
         for (var move : potentialMoves) {
             if (!moveEndsWithCheck(move)) {
@@ -179,7 +181,6 @@ public class ChessGame {
 	    System.out.println("Incheck: " + isInCheck(teamColor));
 	    System.out.println("valid team moves: " + allValidTeamMoves(teamColor));
         return isInCheck(teamColor) && allValidTeamMoves(teamColor).isEmpty();
-//        throw new RuntimeException("Not implemented");
     }
 
     /**
