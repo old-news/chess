@@ -66,11 +66,15 @@ public class ChessMoveCalculator {
                 }
             }
         }
-        ChessPosition leftPos = startpos.plussed(rowDir, -1);
-        if (null != board.getPiece(leftPos) && focusColor != board.getPiece(leftPos).getTeamColor()) {
-            positions.add(leftPos);
+        ChessPosition leftFrontPos = startpos.plussed(rowDir, -1);
+        ChessPosition leftPos = startpos.plussed(0, -1);
+        if ((null != board.getPiece(leftFrontPos) && focusColor != board.getPiece(leftFrontPos).getTeamColor()) ||
+                (null != board.getPiece(leftPos) && focusColor != ChessGame.TeamColor.WHITE)
+        ) {
+            positions.add(leftFrontPos);
         }
         ChessPosition rightPos = startpos.plussed(rowDir, 1);
+
         if (null != board.getPiece(rightPos) && focusColor != board.getPiece(rightPos).getTeamColor()) {
             positions.add(rightPos);
         }
