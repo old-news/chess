@@ -15,12 +15,12 @@ import java.util.Objects;
 public class ChessPiece {
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
-    private ChessMove lastMove;
+    private boolean hasMoved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         color = pieceColor;
         this.type = type;
-        lastMove = null;
+	hasMoved = false;
     }
 
     /**
@@ -61,8 +61,12 @@ public class ChessPiece {
         return calculator.getMoves(myPosition);
     }
 
-    public void setLastMove(ChessMove lastmove) {
-        this.lastMove = lastmove;
+    public void registerMove() {
+	    hasMoved = true;
+    }
+
+    public boolean hasPieceMoved() {
+	    return hasMoved;
     }
 
     public String toString() {

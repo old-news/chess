@@ -62,6 +62,8 @@ public class ChessGame {
 	if (null != enPassantMove) {
 		potentialMoves.add(enPassantMove);
 	}
+	Collection<ChessMove> castleMoves = calculator.getCastleMoves(startPosition, this);
+	potentialMoves.addAll(castleMoves);
         Collection<ChessMove> movesWhichEscapeCheck = new ArrayList<>();
         for (var move : potentialMoves) {
             if (!moveEndsWithCheck(move)) {
@@ -72,7 +74,7 @@ public class ChessGame {
         return movesWhichEscapeCheck;
     }
 
-    private Collection<ChessMove> allTeamMoves(TeamColor color) {
+    public Collection<ChessMove> allTeamMoves(TeamColor color) {
         Collection<ChessMove> moves = new ArrayList<>();
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
@@ -107,6 +109,7 @@ public class ChessGame {
         if (!move.getStartPosition().isInBounds()) throw new InvalidMoveException("Invalid start pos");
         if (!move.getEndPosition().isInBounds()) throw new InvalidMoveException("Invalid end pos");
         var startpos = move.getStartPosition();
+	var endpos = move.getEndPosition();
         var piece = board.getPiece(startpos);
         if (null == piece) {
             throw new InvalidMoveException("Tried to move from empty square");
@@ -125,24 +128,33 @@ public class ChessGame {
 	var killedPiece = board.getPiece(move.getEndPosition());
         if (null != move.getPromotionPiece()) {
             var promotionPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+	    promotionPiece.registerMove();
             board.addPiece(move.getEndPosition(), promotionPiece);
         } else {
-            board.addPiece(move.getEndPosition(), piece);
+	    piece.registerMove();
+	    board.addPiece(move.getEndPosition(), piece);
         }
         turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         lastMove = move;
-	System.out.println("Making move: " + move);
-	var rowDir = move.getEndPosition().getRow() - move.getStartPosition().getRow();
-	var potentialEnPassantVictim = board.getPiece(move.getEndPosition().plussed(-rowDir, 0));
-	System.out.println(piece.getPieceType() == ChessPiece.PieceType.PAWN);
-	System.out.println(potentialEnPassantVictim != null);
-	if (potentialEnPassantVictim != null) {
-		System.out.println(potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN);
-	}
-	System.out.println(null == killedPiece);
+	var rowDir = endpos.getRow() - startpos.getRow();
+	var potentialEnPassantVictim = board.getPiece(endpos.plussed(-rowDir, 0));
 	if (piece.getPieceType() == ChessPiece.PieceType.PAWN && potentialEnPassantVictim != null && potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN && null == killedPiece) {
 		System.out.println("Removing piece due to enpassant");
-		board.removePiece(move.getEndPosition().plussed(-rowDir, 0));
+		board.removePiece(endpos.plussed(-rowDir, 0));
+	}
+	if (piece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(startpos.getColumn() - endpos.getColumn()) == 2) {
+		System.out.println("Castling...");
+		ChessPosition rookOldPos, rookNewPos;
+		if (startpos.getColumn() > endpos.getColumn()) {
+			rookOldPos = new ChessPosition(startpos.getRow(), 1);
+			rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() - 1);
+		} else {
+			rookOldPos = new ChessPosition(startpos.getRow(), 8);
+			rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() + 1);
+		}
+		var rook = board.removePiece(rookOldPos);
+		rook.registerMove();
+		board.addPiece(rookNewPos, rook);
 	}
     }
 
@@ -176,13 +188,17 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+        ChessPosition kingpos = board.search(teamKing).get(0);
+	return isPositionAttacked(teamColor, kingpos);
+    }
+
+    public boolean isPositionAttacked(TeamColor teamColor, ChessPosition pos) {
         var enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         var enemyMoves = allTeamMoves(enemyColor);
-        var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
-        var kingpos = board.search(teamKing);
         for (var move : enemyMoves) {
             var endpos = move.getEndPosition();
-            if (endpos.equals(kingpos)) return true;
+            if (endpos.equals(pos)) return true;
         }
         return false;
     }

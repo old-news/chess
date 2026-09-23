@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChessMoveCalculator {
     private ChessBoard board;
@@ -215,7 +216,36 @@ public class ChessMoveCalculator {
 	    }
 	    ChessPosition enPassantEnd = new ChessPosition(startpos.getRow() + rowDir, lastmove.getEndPosition().getColumn());
 	    ChessMove enPassantMove = new ChessMove(startpos, enPassantEnd, null);
-	    System.out.println("addded nps move");
 	    return enPassantMove;
+    }
+
+    public Collection<ChessMove> getCastleMoves(ChessPosition startpos, ChessGame game) {
+	    var piece = board.getPiece(startpos);
+	    if (null == piece) return new ArrayList<>();
+	    var color = piece.getTeamColor();
+	    if (piece.getPieceType() != ChessPiece.PieceType.KING) return new ArrayList<>();
+	    if (piece.hasPieceMoved()) return new ArrayList<>();
+	    var rookPositions = board.search(new ChessPiece(color, ChessPiece.PieceType.ROOK));
+	    if (rookPositions.isEmpty()) return new ArrayList<>();
+	    if (game.isInCheck(color)) return new ArrayList<>();
+	    Collection<ChessMove> castleMoves = new ArrayList<>();
+	    for (int i = 0; i < rookPositions.size(); i++) {
+		    var rookPos = rookPositions.get(i);
+		    var rook = board.getPiece(rookPos);
+		    if (rook.hasPieceMoved()) continue;
+		    int dir = (startpos.getColumn() > rookPos.getColumn()) ? 1 : -1;
+		    boolean castlingError = false;
+		    for (int col = rookPos.getColumn(); col != startpos.getColumn(); col+=dir) {
+			    var pos = new ChessPosition(rookPos.getRow(), col);
+			    if (Math.abs(startpos.getColumn() - col) <= 2 && game.isPositionAttacked(color, pos)) castlingError = true;
+			    if (col != rookPos.getColumn() && board.getPiece(pos) != null) castlingError = true;
+			    if (castlingError) break;
+		    }
+		    if (!castlingError) {
+		    	ChessMove move = new ChessMove(startpos, startpos.plussed(0, -2*dir), null);
+		    	castleMoves.add(move);
+		    }
+	    }
+	    return castleMoves;
     }
 }
