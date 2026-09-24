@@ -1,15 +1,17 @@
 package chess;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable {
 
 	private ChessPiece[][] board = new ChessPiece[8][8];
 
@@ -59,6 +61,19 @@ public class ChessBoard {
             }
         }
         return found;
+    }
+
+    public Collection<ChessPosition> getTeam(ChessGame.TeamColor color) {
+	    List<ChessPosition> team = new ArrayList<>();
+	    for (int row = 1; row <= 8; row++) {
+		    for (int col = 1; col <= 8; col++) {
+			    var pos = new ChessPosition(row, col);
+			    var piece = getPiece(pos);
+			    if (null == piece || piece.getTeamColor() != color) continue;
+			    team.add(pos);
+		    }
+	    }
+	    return team;
     }
 
     /**
@@ -130,7 +145,7 @@ public class ChessBoard {
         return true;
     }
 
-    public ChessBoard deepcopy() {
+    public ChessBoard clone() {
         var newboard = new ChessBoard();
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {

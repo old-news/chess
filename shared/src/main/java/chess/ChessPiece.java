@@ -16,11 +16,12 @@ public class ChessPiece {
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
     private boolean hasMoved;
+    private ChessMove lastMove;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         color = pieceColor;
         this.type = type;
-	hasMoved = false;
+	    hasMoved = false;
     }
 
     /**
@@ -58,7 +59,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         var calculator = new ChessMoveCalculator(board);
-        return calculator.getMoves(myPosition);
+        return calculator.getMoves(myPosition, lastMove);
     }
 
     public void registerMove() {
@@ -67,6 +68,10 @@ public class ChessPiece {
 
     public boolean hasPieceMoved() {
 	    return hasMoved;
+    }
+
+    public void setLastMove(ChessMove lastMove) {
+        this.lastMove = lastMove;
     }
 
     public String toString() {

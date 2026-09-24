@@ -31,7 +31,7 @@ public class ChessPosition {
     }
 
     public String toString() {
-        return Integer.toString(row) + "," + Integer.toString(col);
+        return row + "," + col;
     }
 
     public boolean equals(Object other) {

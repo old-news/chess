@@ -38,7 +38,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return (null == promotionPiece) ? null : promotionPiece;
+        return promotionPiece;
     }
 
     public String toString() {
@@ -52,7 +52,7 @@ public class ChessMove {
     public boolean equals(Object other) {
         if (this == other) return true;
         if (null == other || !getClass().equals(other.getClass())) return false;
-	return toString().equals(other.toString());
+	    return toString().equals(other.toString());
     }
 
     public int hashCode() {
