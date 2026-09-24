@@ -99,50 +99,69 @@ public class ChessGame {
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
      */
+
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (null == move) throw new InvalidMoveException("`null` move passed to ChessGame.makeMove");
-        var startpos = move.getStartPosition();
-	var endpos = move.getEndPosition();
-        var piece = board.getPiece(startpos);
-        if (null == piece) throw new InvalidMoveException("Tried to move from empty square");
-        if (piece.getTeamColor() != turn) throw new InvalidMoveException("Tried to move out of turn");
-        var validMoves = validMoves(startpos);
-        if (!validMoves.contains(move)) throw new InvalidMoveException("Invalid move for piece");
-        board.removePiece(startpos);
-        var killedPiece = board.getPiece(endpos);
+	    boolean isValid = isMoveValid(move);
+	    if (!isValid) throw new InvalidMoveException();
+	    var startpos = move.getStartPosition();
+	    var endpos = move.getEndPosition();
+	    ChessPiece movingPiece = (null == move.getPromotionPiece()) ? board.getPiece(startpos) : new ChessPiece(turn, move.getPromotionPiece());
 
-        if (null != move.getPromotionPiece()) {
-            var promotionPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
-	    promotionPiece.registerMove();
-            board.addPiece(endpos, promotionPiece);
-        } else {
-            piece.registerMove();
-            board.addPiece(endpos, piece);
-        }
+	    movingPiece.registerMove();
+	    var killedPiece = board.getPiece(endpos);
+	    board.removePiece(startpos);
+	    board.addPiece(endpos, movingPiece);
 
-        turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-	movesMade.add(move);
-        var rowDir = endpos.getRow() - startpos.getRow();
-	var enPassantAttackedPos = endpos.plussed(-rowDir, 0);
-        var potentialEnPassantVictim = board.getPiece(enPassantAttackedPos);
-        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && potentialEnPassantVictim != null && potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN && null == killedPiece) {
-            System.out.println("Removing piece due to enpassant");
-            board.removePiece(enPassantAttackedPos);
-        }
-        if (piece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(startpos.getColumn() - endpos.getColumn()) == 2) {
-            System.out.println("Castling...");
-            ChessPosition rookOldPos, rookNewPos;
-            if (startpos.getColumn() > endpos.getColumn()) {
-                rookOldPos = new ChessPosition(startpos.getRow(), 1);
-                rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() - 1);
-            } else {
-                rookOldPos = new ChessPosition(startpos.getRow(), 8);
-                rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() + 1);
-            }
-            var rook = board.removePiece(rookOldPos);
-            rook.registerMove();
-            board.addPiece(rookNewPos, rook);
-        }
+	    checkDoEnPassantSpecial(move, killedPiece);
+	    checkDoCastleSpecial(move);
+
+	    turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+	    movesMade.add(move);
+
+    }
+
+    private void checkDoEnPassantSpecial(ChessMove move, ChessPiece killedPiece) {
+	    var endpos = move.getEndPosition();
+	    var startpos = move.getStartPosition();
+	    var movingPiece = board.getPiece(endpos);
+
+	    var rowDir = endpos.getRow() - startpos.getRow();
+	    var enPassantAttackedPos = endpos.plussed(-rowDir, 0);
+	    var potentialEnPassantVictim = board.getPiece(enPassantAttackedPos);
+	    if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN && potentialEnPassantVictim != null && potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN && null == killedPiece) {
+		    System.out.println("Removing piece due to enpassant");
+		    board.removePiece(enPassantAttackedPos);
+	    }
+    }
+
+    private void checkDoCastleSpecial(ChessMove move) {
+	    var endpos = move.getEndPosition();
+	    var startpos = move.getStartPosition();
+	    var movingPiece = board.getPiece(endpos);
+
+	    if (movingPiece.getPieceType() == ChessPiece.PieceType.KING && Math.abs(startpos.getColumn() - endpos.getColumn()) == 2) {
+		    System.out.println("Castling...");
+		    ChessPosition rookOldPos, rookNewPos;
+		    if (startpos.getColumn() > endpos.getColumn()) {
+			    rookOldPos = new ChessPosition(startpos.getRow(), 1);
+			    rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() - 1);
+		    } else {
+			    rookOldPos = new ChessPosition(startpos.getRow(), 8);
+			    rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() + 1);
+		    }
+		    var rook = board.removePiece(rookOldPos);
+		    rook.registerMove();
+		    board.addPiece(rookNewPos, rook);
+	    }
+    }
+
+    private boolean isMoveValid(ChessMove move) {
+	    if (null == move) return false;
+	    var piece = board.getPiece(move.getStartPosition());
+	    if (null == piece || piece.getTeamColor() != turn) return false;
+	    var validPieceMoves = validMoves(move.getStartPosition());
+	    if (!validPieceMoves.contains(move)) return false;
+	    return true;
     }
 
     public boolean moveEndsWithCheck(ChessMove move) {
