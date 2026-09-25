@@ -63,6 +63,13 @@ public class ChessBoard implements Cloneable {
         return found;
     }
 
+    public ChessPosition getKingPos(ChessGame.TeamColor color) {
+	    var king = new ChessPiece(color, ChessPiece.PieceType.KING);
+	    var maybePos = search(king);
+	    if (maybePos.isEmpty()) return null;
+	    return maybePos.get(0);
+    }
+
     public Collection<ChessPosition> getTeam(ChessGame.TeamColor color) {
 	    List<ChessPosition> team = new ArrayList<>();
 	    for (int row = 1; row <= 8; row++) {

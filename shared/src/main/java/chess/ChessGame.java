@@ -101,19 +101,11 @@ public class ChessGame {
      */
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
+	    System.out.println(board);
 	    boolean isValid = isMoveValid(move);
 	    if (!isValid) throw new InvalidMoveException();
-	    var startpos = move.getStartPosition();
-	    var endpos = move.getEndPosition();
-	    ChessPiece movingPiece = (null == move.getPromotionPiece()) ? board.getPiece(startpos) : new ChessPiece(turn, move.getPromotionPiece());
 
-	    movingPiece.registerMove();
-	    var killedPiece = board.getPiece(endpos);
-	    board.removePiece(startpos);
-	    board.addPiece(endpos, movingPiece);
-
-	    checkDoEnPassantSpecial(move, killedPiece);
-	    checkDoCastleSpecial(move);
+	    makeStatelessMove(move, true);
 
 	    turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 	    movesMade.add(move);
@@ -134,7 +126,7 @@ public class ChessGame {
 	    }
     }
 
-    private void checkDoCastleSpecial(ChessMove move) {
+    private void checkDoCastleSpecial(ChessMove move, boolean shouldRegisterMove) {
 	    var endpos = move.getEndPosition();
 	    var startpos = move.getStartPosition();
 	    var movingPiece = board.getPiece(endpos);
@@ -150,7 +142,7 @@ public class ChessGame {
 			    rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() + 1);
 		    }
 		    var rook = board.removePiece(rookOldPos);
-		    rook.registerMove();
+		    if (shouldRegisterMove) rook.registerMove();
 		    board.addPiece(rookNewPos, rook);
 	    }
     }
@@ -165,12 +157,20 @@ public class ChessGame {
     }
 
     public boolean moveEndsWithCheck(ChessMove move) {
-        var movingPiece = board.getPiece(move.getStartPosition());
-        var endpiece = board.getPiece(move.getEndPosition());
-	makeMoveNoInvalidChecks(move);
-        var endedInCheck = isInCheck(movingPiece.getTeamColor());
-	reverseMove(move, endpiece);
-        return endedInCheck;
+	    var oldBoard = board.clone();
+	    var teamColor = board.getPiece(move.getStartPosition()).getTeamColor();
+	    makeStatelessMove(move, false);
+	    var endedInCheck = isInCheck(teamColor);
+	    board = oldBoard;
+	    return endedInCheck;
+        /*
+         * var movingPiece = board.getPiece(move.getStartPosition());
+         * var endpiece = board.getPiece(move.getEndPosition());
+	 * makeMoveNoInvalidChecks(move);
+         * var endedInCheck = isInCheck(movingPiece.getTeamColor());
+	 * reverseMove(move, endpiece);
+         * return endedInCheck;
+         */
     }
 
     private void reverseMove(ChessMove move, ChessPiece killedPiece) {
@@ -185,6 +185,25 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
     }
 
+    private void makeStatelessMove(ChessMove move, boolean shouldRegisterMove) {
+	    var startpos = move.getStartPosition();
+	    var endpos = move.getEndPosition();
+	    var startpiece = board.getPiece(startpos);
+	    var movingPiece = startpiece;
+	    if (null != move.getPromotionPiece()) {
+		    movingPiece = new ChessPiece(startpiece.getTeamColor(), move.getPromotionPiece());
+	    }
+	    // ChessPiece movingPiece = (null == move.getPromotionPiece()) ? board.getPiece(startpos) : new ChessPiece(board.getPiece(startpos).getTeamColor(), move.getPromotionPiece());
+	    var killedPiece = board.getPiece(endpos);
+
+	    if (shouldRegisterMove) movingPiece.registerMove();
+	    board.removePiece(startpos);
+	    board.addPiece(endpos, movingPiece);
+
+	    checkDoEnPassantSpecial(move, killedPiece);
+	    checkDoCastleSpecial(move, shouldRegisterMove);
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -192,12 +211,13 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
-        ChessPosition kingpos = board.search(teamKing).get(0);
+        // var teamKing = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+	ChessPosition kingpos = board.getKingPos(teamColor);
 	return isPositionAttacked(teamColor, kingpos);
     }
 
     public boolean isPositionAttacked(TeamColor teamColor, ChessPosition pos) {
+	    if (null == pos) return false;
         var enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         var enemyMoves = allTeamMoves(enemyColor);
         for (var move : enemyMoves) {
