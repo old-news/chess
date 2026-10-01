@@ -13,11 +13,9 @@ import java.util.Collection;
  */
 public class ChessBoard implements Cloneable {
 	private ChessPiece[][] board;
-	private final ChessPieceFinder finder;
 
     public ChessBoard() {
-	board = new ChessPiece[8][8];
-	finder = new ChessPieceFinder(this);
+        board = new ChessPiece[8][8];
     }
 
     /**
