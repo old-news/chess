@@ -76,7 +76,7 @@ public class ChessGame {
 	    Collection<ChessMove> moves = new ArrayList<>();
 	    for (var pos : teamPositions) {
 		    var piece = board.getPiece(pos);
-		    if (null == piece) continue;
+		    if (null == piece) {continue;}
 		    moves.addAll(piece.pieceMoves(board, pos));
 	    }
 	    return moves;
@@ -103,7 +103,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
 	    System.out.println(board);
 	    boolean isValid = isMoveValid(move);
-	    if (!isValid) throw new InvalidMoveException();
+	    if (!isValid) {throw new InvalidMoveException();}
 
 	    makeStatelessMove(move, true);
 
@@ -147,17 +147,17 @@ public class ChessGame {
 			    rookNewPos = new ChessPosition(startpos.getRow(), startpos.getColumn() + 1);
 		    }
 		    var rook = board.removePiece(rookOldPos);
-		    if (shouldRegisterMove) rook.registerMove();
+		    if (shouldRegisterMove) {rook.registerMove();}
 		    board.addPiece(rookNewPos, rook);
 	    }
     }
 
     private boolean isMoveValid(ChessMove move) {
-	    if (null == move) return false;
+	    if (null == move) {return false;}
 	    var piece = board.getPiece(move.getStartPosition());
-	    if (null == piece || piece.getTeamColor() != turn) return false;
+	    if (null == piece || piece.getTeamColor() != turn) {return false;}
 	    var validPieceMoves = validMoves(move.getStartPosition());
-	    if (!validPieceMoves.contains(move)) return false;
+	    if (!validPieceMoves.contains(move)) {return false;}
 	    return true;
     }
 
@@ -188,7 +188,7 @@ public class ChessGame {
 	    }
 	    var killedPiece = board.getPiece(endpos);
 
-	    if (shouldRegisterMove) movingPiece.registerMove();
+	    if (shouldRegisterMove) {movingPiece.registerMove();}
 	    board.removePiece(startpos);
 	    board.addPiece(endpos, movingPiece);
 
@@ -209,12 +209,12 @@ public class ChessGame {
     }
 
     public boolean isPositionAttacked(TeamColor teamColor, ChessPosition pos) {
-	    if (null == pos) return false;
+	    if (null == pos) {return false;}
         var enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
         var enemyMoves = allTeamMoves(enemyColor);
         for (var move : enemyMoves) {
             var endpos = move.getEndPosition();
-            if (endpos.equals(pos)) return true;
+            if (endpos.equals(pos)) {return true;}
         }
         return false;
     }
@@ -263,8 +263,8 @@ public class ChessGame {
     }
 
     public boolean equals(Object other) {
-        if (this == other) return true;
-        if (null == other || !getClass().equals(other.getClass())) return false;
+        if (this == other) {return true;}
+        if (null == other || !getClass().equals(other.getClass())) {return false;}
         return toString().equals(other.toString());
     }
 

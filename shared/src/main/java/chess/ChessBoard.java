@@ -25,7 +25,7 @@ public class ChessBoard implements Cloneable {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if (!position.isInBounds()) return;
+        if (!position.isInBounds()) {return;}
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
@@ -43,13 +43,13 @@ public class ChessBoard implements Cloneable {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        if (!position.isInBounds()) return null;
+        if (!position.isInBounds()) {return null;}
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
     public List<ChessPosition> search(ChessPiece piece) {
 	List<ChessPosition> found = new ArrayList<>();
-        if (null == piece) return null;
+        if (null == piece) {return null;}
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 var pos = new ChessPosition(row, col);
@@ -65,7 +65,7 @@ public class ChessBoard implements Cloneable {
     public ChessPosition getKingPos(ChessGame.TeamColor color) {
 	    var king = new ChessPiece(color, ChessPiece.PieceType.KING);
 	    var maybePos = search(king);
-	    if (maybePos.isEmpty()) return null;
+	    if (maybePos.isEmpty()) {return null;}
 	    return maybePos.get(0);
     }
 
@@ -75,7 +75,7 @@ public class ChessBoard implements Cloneable {
 		    for (int col = 1; col <= 8; col++) {
 			    var pos = new ChessPosition(row, col);
 			    var piece = getPiece(pos);
-			    if (null == piece || piece.getTeamColor() != color) continue;
+			    if (null == piece || piece.getTeamColor() != color) {continue;}
 			    team.add(pos);
 		    }
 	    }
@@ -132,8 +132,8 @@ public class ChessBoard implements Cloneable {
     }
 
     public boolean equals(Object other) {
-        if (this == other) return true;
-        if (null == other || getClass() != other.getClass()) return false;
+        if (this == other) {return true;}
+        if (null == other || getClass() != other.getClass()) {return false;}
         return toString().equals(other.toString());
     }
 

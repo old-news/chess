@@ -103,9 +103,9 @@ public class ChessPiece {
     }
 
     public boolean equals(Object other) {
-        if (this == other) return true;
-        if (null == other) return false;
-        if (!getClass().equals(other.getClass())) return false;
+        if (this == other) {return true;}
+        if (null == other) {return false;}
+        if (!getClass().equals(other.getClass())) {return false;}
         return toString().equals(other.toString());
     }
 

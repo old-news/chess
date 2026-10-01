@@ -51,7 +51,7 @@ public class ChessMoveCalculator {
             }
         }
         for (ChessPosition pos : positions) {
-            if (!pos.isInBounds()) continue;
+            if (!pos.isInBounds()) {continue;}
             moves.add(new ChessMove(startpos, pos, null));
         }
         return moves;
@@ -141,27 +141,27 @@ public class ChessMoveCalculator {
         List<ChessPosition> positions = new ArrayList<>();
         for (int i = 1; startpos.getColumn()+i <= 8; i++) {
             var pos = startpos.plussed(0, i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = -1; startpos.getColumn()+i >= 1; i--) {
             var pos = startpos.plussed(0, i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = 1; startpos.getRow()+i <= 8; i++) {
             var pos = startpos.plussed(i, 0);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = -1; startpos.getRow()+i >= 1; i--) {
             var pos = startpos.plussed(i, 0);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         return positions;
     }
@@ -170,27 +170,27 @@ public class ChessMoveCalculator {
         List<ChessPosition> positions = new ArrayList<>();
         for (int i = 1; startpos.plussed(i, i).isInBounds(); i++) {
             var pos = startpos.plussed(i, i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = 1; startpos.plussed(-i, i).isInBounds(); i++) {
             var pos = startpos.plussed(-i, i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = 1; startpos.plussed(i, -i).isInBounds(); i++) {
             var pos = startpos.plussed(i, -i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         for (int i = 1; startpos.plussed(-i, -i).isInBounds(); i++) {
             var pos = startpos.plussed(-i, -i);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
-            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) break;
+            if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
         return positions;
     }
@@ -205,15 +205,20 @@ public class ChessMoveCalculator {
     }
 
     public ChessMove getEnPassant(ChessPosition startpos, ChessMove lastmove) {
-        if (null == lastmove) return null;
+        if (null == lastmove) {return null;}
 	    setCurrent(startpos);
-	    if (null == currentPiece || ChessPiece.PieceType.PAWN != currentPiece.getPieceType()) return null;
+	    if (null == currentPiece || ChessPiece.PieceType.PAWN != currentPiece.getPieceType()) {return null;}
 	    int rowDir = (currentColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
-	    if ((currentColor == ChessGame.TeamColor.WHITE && startpos.getRow() != 5) || (currentColor == ChessGame.TeamColor.BLACK && startpos.getRow() != 4)) return null;
+	    if (
+		(currentColor == ChessGame.TeamColor.WHITE && startpos.getRow() != 5) ||
+		(currentColor == ChessGame.TeamColor.BLACK && startpos.getRow() != 4)
+	    ) {
+		    return null;
+	    }
 	    var lastMovedPiece = board.getPiece(lastmove.getEndPosition());
-	    if (lastMovedPiece.getPieceType() != ChessPiece.PieceType.PAWN) return null;
-	    if (Math.abs(lastmove.getEndPosition().getRow() - lastmove.getStartPosition().getRow()) != 2) return null;
-	    if (Math.abs(startpos.getColumn() - lastmove.getEndPosition().getColumn()) != 1) return null;
+	    if (lastMovedPiece.getPieceType() != ChessPiece.PieceType.PAWN) {return null;}
+	    if (Math.abs(lastmove.getEndPosition().getRow() - lastmove.getStartPosition().getRow()) != 2) {return null;}
+	    if (Math.abs(startpos.getColumn() - lastmove.getEndPosition().getColumn()) != 1) {return null;}
 	    if ((lastMovedPiece.getTeamColor() == ChessGame.TeamColor.WHITE && lastmove.getStartPosition().getRow() != 2) ||
 		    (lastMovedPiece.getTeamColor() == ChessGame.TeamColor.BLACK && lastmove.getStartPosition().getRow() != 7)
 	    ) {
@@ -226,24 +231,24 @@ public class ChessMoveCalculator {
 final
     public Collection<ChessMove> getCastleMoves(ChessPosition startpos, ChessGame game) {
 	    setCurrent(startpos);
-	    if (null == currentPiece) return new ArrayList<>();
-	    if (currentPiece.getPieceType() != ChessPiece.PieceType.KING) return new ArrayList<>();
-	    if (currentPiece.hasPieceMoved()) return new ArrayList<>();
+	    if (null == currentPiece) {return new ArrayList<>();}
+	    if (currentPiece.getPieceType() != ChessPiece.PieceType.KING) {return new ArrayList<>();}
+	    if (currentPiece.hasPieceMoved()) {return new ArrayList<>();}
 	    var rookPositions = board.search(new ChessPiece(currentColor, ChessPiece.PieceType.ROOK));
-	    if (rookPositions.isEmpty()) return new ArrayList<>();
-	    if (game.isInCheck(currentColor)) return new ArrayList<>();
+	    if (rookPositions.isEmpty()) {return new ArrayList<>();}
+	    if (game.isInCheck(currentColor)) {return new ArrayList<>();}
 	    Collection<ChessMove> castleMoves = new ArrayList<>();
 	    for (int i = 0; i < rookPositions.size(); i++) {
 		    var rookPos = rookPositions.get(i);
 		    var rook = board.getPiece(rookPos);
-		    if (rook.hasPieceMoved()) continue;
+		    if (rook.hasPieceMoved()) {continue;}
 		    int dir = (startpos.getColumn() > rookPos.getColumn()) ? 1 : -1;
 		    boolean castlingError = false;
 		    for (int col = rookPos.getColumn(); col != startpos.getColumn(); col+=dir) {
 			    var pos = new ChessPosition(rookPos.getRow(), col);
-			    if (Math.abs(startpos.getColumn() - col) <= 2 && game.isPositionAttacked(currentColor, pos)) castlingError = true;
-			    if (col != rookPos.getColumn() && board.getPiece(pos) != null) castlingError = true;
-			    if (castlingError) break;
+			    if (Math.abs(startpos.getColumn() - col) <= 2 && game.isPositionAttacked(currentColor, pos)) {castlingError = true;}
+			    if (col != rookPos.getColumn() && board.getPiece(pos) != null) {castlingError = true;}
+			    if (castlingError) {break;}
 		    }
 		    if (!castlingError) {
 		    	ChessMove move = new ChessMove(startpos, startpos.plussed(0, -2*dir), null);
