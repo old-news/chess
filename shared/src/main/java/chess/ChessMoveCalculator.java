@@ -118,7 +118,7 @@ public class ChessMoveCalculator {
 
     private List<ChessPosition> getKnightMovePositions(ChessPosition startpos) {
         List<ChessPosition> positions = new ArrayList<>();
-        int[][] adjs = new int[][]{
+        int[][] adjustments = new int[][]{
                 {1, 2},
                 {1, -2},
                 {-1, 2},
@@ -128,7 +128,7 @@ public class ChessMoveCalculator {
                 {-2, 1},
                 {-2, -1}
         };
-        for (var adj : adjs) {
+        for (var adj : adjustments) {
             var pos = startpos.plussed(adj[0], adj[1]);
             if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != currentColor) {
                 positions.add(pos);
@@ -145,8 +145,8 @@ public class ChessMoveCalculator {
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
-        for (int i = -1; startpos.getColumn()+i >= 1; i--) {
-            var pos = startpos.plussed(0, i);
+        for (int i = 1; startpos.getColumn()-i >= 1; i++) {
+            var pos = startpos.plussed(0, -i);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
@@ -157,8 +157,8 @@ public class ChessMoveCalculator {
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
         }
-        for (int i = -1; startpos.getRow()+i >= 1; i--) {
-            var pos = startpos.plussed(i, 0);
+        for (int i = 1; startpos.getRow()-i >= 1; i++) {
+            var pos = startpos.plussed(-i, 0);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() == currentColor) {break;}
             positions.add(pos);
             if (null != board.getPiece(pos) && board.getPiece(pos).getTeamColor() != currentColor) {break;}
