@@ -12,11 +12,12 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessBoard implements Cloneable {
-
-	private ChessPiece[][] board = new ChessPiece[8][8];
+	private ChessPiece[][] board;
+	private final ChessPieceFinder finder;
 
     public ChessBoard() {
-        return;
+	board = new ChessPiece[8][8];
+	finder = new ChessPieceFinder(this);
     }
 
     /**
@@ -111,7 +112,6 @@ public class ChessBoard implements Cloneable {
         for (int i = 3; i <= 6; i++) {
             for (int j = 1; j <= 8; j++) {
 		removePiece(new ChessPosition(i, j));
-                // board[i][j] = null;
             }
         }
     }
@@ -141,15 +141,6 @@ public class ChessBoard implements Cloneable {
 
     public int hashCode() {
         return toString().hashCode();
-    }
-
-    public boolean empty() {
-        for (var row : board) {
-            for (var val : board) {
-                if (null != val) return false;
-            }
-        }
-        return true;
     }
 
     public ChessBoard clone() {

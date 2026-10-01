@@ -3,7 +3,6 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChessMoveCalculator {
     private ChessBoard board;
@@ -224,7 +223,7 @@ public class ChessMoveCalculator {
 	    ChessMove enPassantMove = new ChessMove(startpos, enPassantEnd, null);
 	    return enPassantMove;
     }
-
+final
     public Collection<ChessMove> getCastleMoves(ChessPosition startpos, ChessGame game) {
 	    setCurrent(startpos);
 	    if (null == currentPiece) return new ArrayList<>();

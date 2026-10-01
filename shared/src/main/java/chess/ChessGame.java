@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class ChessGame {
     private ChessBoard board;
+    private final List<ChessMove> movesMade;
     private ChessGame.TeamColor turn;
-    private List<ChessMove> movesMade;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -120,7 +120,12 @@ public class ChessGame {
 	    var rowDir = endpos.getRow() - startpos.getRow();
 	    var enPassantAttackedPos = endpos.plussed(-rowDir, 0);
 	    var potentialEnPassantVictim = board.getPiece(enPassantAttackedPos);
-	    if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN && potentialEnPassantVictim != null && potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN && null == killedPiece) {
+	    if (
+		movingPiece.getPieceType() == ChessPiece.PieceType.PAWN &&
+		potentialEnPassantVictim != null &&
+		potentialEnPassantVictim.getPieceType() == ChessPiece.PieceType.PAWN
+		&& null == killedPiece
+	    ) {
 		    System.out.println("Removing piece due to enpassant");
 		    board.removePiece(enPassantAttackedPos);
 	    }
@@ -173,18 +178,6 @@ public class ChessGame {
          */
     }
 
-    private void reverseMove(ChessMove move, ChessPiece killedPiece) {
-        var piece = board.getPiece(move.getEndPosition());
-        board.addPiece(move.getEndPosition(), killedPiece);
-        board.addPiece(move.getStartPosition(), piece);
-    }
-
-    public void makeMoveNoInvalidChecks(ChessMove move) {
-        var piece = board.getPiece(move.getStartPosition());
-        board.removePiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), piece);
-    }
-
     private void makeStatelessMove(ChessMove move, boolean shouldRegisterMove) {
 	    var startpos = move.getStartPosition();
 	    var endpos = move.getEndPosition();
@@ -193,7 +186,6 @@ public class ChessGame {
 	    if (null != move.getPromotionPiece()) {
 		    movingPiece = new ChessPiece(startpiece.getTeamColor(), move.getPromotionPiece());
 	    }
-	    // ChessPiece movingPiece = (null == move.getPromotionPiece()) ? board.getPiece(startpos) : new ChessPiece(board.getPiece(startpos).getTeamColor(), move.getPromotionPiece());
 	    var killedPiece = board.getPiece(endpos);
 
 	    if (shouldRegisterMove) movingPiece.registerMove();
