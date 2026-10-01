@@ -107,8 +107,8 @@ public class ChessMoveCalculator {
                 {1, -1},
                 {-1, -1}
         };
-        for (var adj : adjustments) {
-            var pos = startpos.plussed(adj[0], adj[1]);
+        for (var adjustment : adjustments) {
+            var pos = startpos.plussed(adjustment[0], adjustment[1]);
             if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != currentColor) {
                 positions.add(pos);
             }
