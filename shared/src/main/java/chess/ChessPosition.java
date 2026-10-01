@@ -6,7 +6,7 @@ package chess;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPosition {
+public class ChessPosition extends DefaultEqualsHashcode {
     private int row, col;
 
     public ChessPosition(int row, int col) {
@@ -32,16 +32,6 @@ public class ChessPosition {
 
     public String toString() {
         return row + "," + col;
-    }
-
-    public boolean equals(Object other) {
-        if (this == other) {return true;}
-        if (null == other || !getClass().equals(other.getClass())) {return false;}
-        return toString().equals(other.toString());
-    }
-
-    public int hashCode() {
-        return row + 8*col;
     }
 
     public ChessPosition plussed(int rowadj, int coladj) {

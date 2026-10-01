@@ -6,7 +6,7 @@ package chess;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessMove {
+public class ChessMove extends DefaultEqualsHashcode {
     private final ChessPosition startpos, endpos;
     private final ChessPiece.PieceType promotionPiece;
 
@@ -47,15 +47,5 @@ public class ChessMove {
             piecestr = promotionPiece.toString();
         }
         return piecestr + " " + startpos.toString() + " " + endpos.toString();
-    }
-
-    public boolean equals(Object other) {
-        if (this == other) {return true;}
-        if (null == other || !getClass().equals(other.getClass())) {return false;}
-	    return toString().equals(other.toString());
-    }
-
-    public int hashCode() {
-        return toString().hashCode();
     }
 }

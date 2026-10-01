@@ -13,7 +13,7 @@ import java.util.List;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessGame {
+public class ChessGame extends DefaultEqualsHashcode {
     private ChessBoard board;
     private final List<ChessMove> movesMade;
     private ChessGame.TeamColor turn;
@@ -260,16 +260,6 @@ public class ChessGame {
 
     public String toString() {
         return board.toString() + "\n" + ((turn == TeamColor.WHITE) ? "W" : "B");
-    }
-
-    public boolean equals(Object other) {
-        if (this == other) {return true;}
-        if (null == other || !getClass().equals(other.getClass())) {return false;}
-        return toString().equals(other.toString());
-    }
-
-    public int hashCode() {
-        return toString().hashCode();
     }
 
     private ChessMove lastMove() {

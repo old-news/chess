@@ -12,7 +12,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece extends DefaultEqualsHashcode {
     private final ChessGame.TeamColor color;
     private final ChessPiece.PieceType type;
     private boolean hasMoved;
@@ -100,16 +100,5 @@ public class ChessPiece {
             retval = retval.toUpperCase();
         }
         return retval;
-    }
-
-    public boolean equals(Object other) {
-        if (this == other) {return true;}
-        if (null == other) {return false;}
-        if (!getClass().equals(other.getClass())) {return false;}
-        return toString().equals(other.toString());
-    }
-
-    public int hashCode() {
-        return toString().hashCode();
     }
 }

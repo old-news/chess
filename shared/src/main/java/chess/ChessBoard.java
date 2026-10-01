@@ -11,7 +11,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard implements Cloneable {
+public class ChessBoard extends DefaultEqualsHashcode implements Cloneable {
 	private ChessPiece[][] board;
 
     public ChessBoard() {
@@ -129,16 +129,6 @@ public class ChessBoard implements Cloneable {
             retval += '\n';
         }
         return retval;
-    }
-
-    public boolean equals(Object other) {
-        if (this == other) {return true;}
-        if (null == other || getClass() != other.getClass()) {return false;}
-        return toString().equals(other.toString());
-    }
-
-    public int hashCode() {
-        return toString().hashCode();
     }
 
     public ChessBoard clone() {
