@@ -118,7 +118,7 @@ public class ChessMoveCalculator {
 
     private List<ChessPosition> getKnightMovePositions(ChessPosition startpos) {
         List<ChessPosition> positions = new ArrayList<>();
-        int[][] adjustments = new int[][]{
+        int[][] adjs = new int[][]{
                 {1, 2},
                 {1, -2},
                 {-1, 2},
@@ -128,7 +128,7 @@ public class ChessMoveCalculator {
                 {-2, 1},
                 {-2, -1}
         };
-        for (var adj : adjustments) {
+        for (var adj : adjs) {
             var pos = startpos.plussed(adj[0], adj[1]);
             if (board.getPiece(pos) == null || board.getPiece(pos).getTeamColor() != currentColor) {
                 positions.add(pos);
