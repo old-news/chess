@@ -9,7 +9,7 @@ public class ClearService {
 		da = access;
 	}
 
-	public DeleteDBResult deleteDB() {
+	public ClearDBResult clearDB() {
 		da.clearAuth();
 		da.clearGames();
 		da.clearUsers();
