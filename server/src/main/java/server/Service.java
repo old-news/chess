@@ -5,20 +5,24 @@ import java.util.UUID;
 import java.util.Map;
 import java.util.HashMap;
 
-import dataacess.DataAccessException;
+import dataaccess.*;
 
 
 public class Service {
 	private final DataAccess da;
 
-	public Map<String, String> register(String username, String password, String email) {
+	public Service() {
+		da = new DataAccess();
+	}
+
+	public Map<String, String> registerUser(String username, String password, String email) throws DataAccessException {
 		var user = da.getUser(username);
 		if (null != user)
-			return DataAccessException("Error: username already taken");
+			throw new DataAccessException("Error: username already taken");
 		user = new UserData(username, password, email);
 		AuthData auth = createAuthData(username);
-		da.add(user);
-		da.add(auth);
+		da.addUser(user);
+		da.addAuth(auth);
 		return Map.of("username", user, "authToken", auth.token);
 	}
 
