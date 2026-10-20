@@ -1,3 +1,3 @@
 package server;
 
-public record LogoutRequest(AuthData auth) {};
+public record LogoutRequest(String authToken) {};
