@@ -1,3 +1,3 @@
 package server;
 
-public record CreateGameRequest(AuthData auth, String gameName) {};
+public record CreateGameRequest(String authToken, String gameName) {};

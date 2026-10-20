@@ -1,3 +1,3 @@
 package server;
 
-public record JoinGameRequest(AuthData auth, String playerColor, int gameID) {};
+public record JoinGameRequest(String authToken, String playerColor, int gameID) {};

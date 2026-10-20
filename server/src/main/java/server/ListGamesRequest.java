@@ -1,3 +1,3 @@
 package server;
 
-public record ListGamesRequest(AuthData auth);
+public record ListGamesRequest(String authToken);

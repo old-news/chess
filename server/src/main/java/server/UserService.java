@@ -2,7 +2,7 @@ package server;
 
 import java.util.UUID;
 
-import dataaccess.DataAccessException;
+import dataaccess.*;
 
 public class UserService {
 	private final DataAccess da;
