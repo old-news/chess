@@ -61,7 +61,7 @@ public class GameService {
 	private static GameData addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
 		if (playerColor.equals("white")) {
 			return new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
-		} else if ("black" == playerColor) {
+		} else if (playerColor.equals("black")) {
 			return new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
 		}
 		throw new DataAccessException("invalid join color");

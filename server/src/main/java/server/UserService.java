@@ -11,7 +11,7 @@ public class UserService {
 		da = access;
 	}
 
-	public RegisterResult register(RegisterRequest req) throws DataAccessException {
+	public RegisterResult registerUser(RegisterRequest req) throws DataAccessException {
 		String username = req.username();
 		String password = req.password();
 		String email = req.email();
