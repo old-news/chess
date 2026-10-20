@@ -16,7 +16,7 @@ public class UserService {
 		if (null != user)
 			throw new DataAccessException("username already taken");
 		user = new UserData(req.username, req.password, req.email);
-		AuthData auth = new generateAuth(req.username);
+		AuthData auth = generateAuth(req.username);
 		da.addUser(user);
 		da.addAuth(auth);
 		return new RegisterResult(auth);
@@ -35,7 +35,7 @@ public class UserService {
 		
 	}
 
-	public void logout(LogoutRequest req) {
+	public LogoutResult logout(LogoutRequest req) throws DataAccessException {
 		AuthData auth = da.findAuth(req.authToken);
 		if (null == auth)
 			throw new DataAccessException("no active session");
@@ -53,7 +53,7 @@ public class UserService {
 	}
 
 	private static boolean validateCredentials(String username, String password, UserData user) {
-		if (!username.equals(user.username) || !password.equals(user.password)) reutrn false;
+		if (!username.equals(user.username) || !password.equals(user.password)) return false;
 		return true;
 	}
 }

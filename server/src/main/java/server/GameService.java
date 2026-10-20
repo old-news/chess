@@ -1,9 +1,10 @@
 package server;
 
+import java.util.Collection;
 import java.util.Random;
 
 import dataaccess.*;
-import shared.ChessGame;
+import chess.ChessGame;
 
 public class GameService {
 	private final DataAccess da;
@@ -13,15 +14,15 @@ public class GameService {
 	}
 
 	public ListGamesResult listGames(ListGamesRequest req) throws DataAccessException {
-		AuthData auth = da.getAuth(req.authToken);
+		AuthData auth = da.findAuth(req.authToken);
 		if (null == auth)
 			throw new DataAccessException("not logged in");
 		Collection<GameData> games = da.getGames();
 		return new ListGamesResult(games);
 	}
 
-	public CreateGameResult createGame(CreateGameRequest req) {
-		AuthData auth = da.getAuth(req.authToken);
+	public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException {
+		AuthData auth = da.findAuth(req.authToken);
 		if (null == auth)
 			throw new DataAccessException("not logged in");
 		int gameID = generateGameID();
@@ -30,11 +31,11 @@ public class GameService {
 		return new CreateGameResult(gameData);
 	}
 
-	public JoinGameResult joinGame(JoinGameRequest req) {
-		AuthData auth = da.getAuth(req.authToken);
+	public JoinGameResult joinGame(JoinGameRequest req) throws DataAccessException {
+		AuthData auth = da.findAuth(req.authToken);
 		if (null == auth)
 			throw new DataAccessException("not logged in");
-		GameData game = da.getGame(req.gameID);
+		GameData game = da.findGame(req.gameID);
 		if (null == game)
 			throw new DataAccessException("game not found");
 		boolean isColorTaken = checkColorNotTaken(req.playerColor, game);
@@ -45,21 +46,29 @@ public class GameService {
 		return new JoinGameResult(game);
 	}
 
+	private static boolean checkColorNotTaken(String playerColor, GameData game) {
+		if ("white" == playerColor) {
+			return null == game.whiteUsername;
+		} else if ("black" == playerColor) {
+			return null == game.blackUsername;
+		}
+		return true;
+	}
+
 	private static void addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
 		if ("white" == playerColor) {
 			game.whiteUsername = username
 		} else if ("black" == playerColor) {
 			game.blackUsername = username
-		} else {
-			throw new DataAccessException("invalid join color");
 		}
+		throw new DataAccessException("invalid join color");
 	}
 
-	private static int generateGameID() {
-		int id;
+	private int generateGameID() {
+		int id = 0;
 		do {
-			id += (new Random()).nextInt(Math.pow(2, 31));
-		} while (null != da.findGame(gameID));
+			id += (new Random()).nextInt((int) Math.pow(2, 31));
+		} while (null != da.findGame(id));
 		return id;
 	}
 }
