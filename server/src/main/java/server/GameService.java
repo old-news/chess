@@ -14,7 +14,8 @@ public class GameService {
 	}
 
 	public ListGamesResult listGames(ListGamesRequest req) throws DataAccessException {
-		AuthData auth = da.findAuth(req.authToken);
+		String authToken = req.authToken();
+		AuthData auth = da.findAuth(authToken);
 		if (null == auth)
 			throw new DataAccessException("not logged in");
 		Collection<GameData> games = da.getGames();
@@ -22,44 +23,46 @@ public class GameService {
 	}
 
 	public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException {
-		AuthData auth = da.findAuth(req.authToken);
+		AuthData auth = da.findAuth(req.authToken());
 		if (null == auth)
 			throw new DataAccessException("not logged in");
+		String username = auth.username();
+		String gameName = req.gameName();
 		int gameID = generateGameID();
 		ChessGame gameObject = new ChessGame();
-		GameData gameData = new GameData(gameID, auth.username, null, req.gameName, gameObject);
+		GameData gameData = new GameData(gameID, username, null, gameName, gameObject);
 		return new CreateGameResult(gameData);
 	}
 
 	public JoinGameResult joinGame(JoinGameRequest req) throws DataAccessException {
-		AuthData auth = da.findAuth(req.authToken);
+		AuthData auth = da.findAuth(req.authToken());
 		if (null == auth)
 			throw new DataAccessException("not logged in");
-		GameData game = da.findGame(req.gameID);
+		GameData game = da.findGame(req.gameID());
 		if (null == game)
 			throw new DataAccessException("game not found");
-		boolean isColorTaken = checkColorNotTaken(req.playerColor, game);
+		boolean isColorTaken = checkColorNotTaken(req.playerColor(), game);
 		if (true == isColorTaken)
 			throw new DataAccessException("color already taken");
-		addUserToGame(auth.username, req.playerColor, game);
-		da.overwriteGame(game);
-		return new JoinGameResult(game);
+		GameData joinedGame = addUserToGame(auth.username(), req.playerColor(), game);
+		da.overwriteGame(joinedGame);
+		return new JoinGameResult(joinedGame);
 	}
 
 	private static boolean checkColorNotTaken(String playerColor, GameData game) {
-		if ("white" == playerColor) {
-			return null == game.whiteUsername;
-		} else if ("black" == playerColor) {
-			return null == game.blackUsername;
+		if (playerColor.equals("white")) {
+			return null == game.whiteUsername();
+		} else if (playerColor.equals("black")) {
+			return null == game.blackUsername();
 		}
 		return true;
 	}
 
-	private static void addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
-		if ("white" == playerColor) {
-			game.whiteUsername = username
+	private static GameData addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
+		if (playerColor.equals("white")) {
+			return new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
 		} else if ("black" == playerColor) {
-			game.blackUsername = username
+			return new GameData(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
 		}
 		throw new DataAccessException("invalid join color");
 	}

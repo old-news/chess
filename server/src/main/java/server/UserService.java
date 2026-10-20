@@ -12,34 +12,40 @@ public class UserService {
 	}
 
 	public RegisterResult register(RegisterRequest req) throws DataAccessException {
-		UserData user = da.getUser(req.username);
+		String username = req.username();
+		String password = req.password();
+		String email = req.email();
+		UserData user = da.getUser(username);
 		if (null != user)
 			throw new DataAccessException("username already taken");
-		user = new UserData(req.username, req.password, req.email);
-		AuthData auth = generateAuth(req.username);
+		user = new UserData(username, password, email);
+		AuthData auth = generateAuth(username);
 		da.addUser(user);
 		da.addAuth(auth);
 		return new RegisterResult(auth);
 	}
 
 	public LoginResult login(LoginRequest req) throws DataAccessException {
-		UserData user = da.getUser(req.username);
+		String username = req.username();
+		String password = req.password();
+		UserData user = da.getUser(username);
 		if (null == user)
 			throw new DataAccessException("wrong username");
-		boolean credentialsAreValid = validateCredentials(req.username, req.password, user);
+		boolean credentialsAreValid = validateCredentials(username, password, user);
 		if (!credentialsAreValid)
 			throw new DataAccessException("invalid credentials");
-		AuthData auth = generateAuth(req.username);
+		AuthData auth = generateAuth(username);
 		da.addAuth(auth);
 		return new LoginResult(auth);
 		
 	}
 
 	public LogoutResult logout(LogoutRequest req) throws DataAccessException {
-		AuthData auth = da.findAuth(req.authToken);
+		String authToken = req.authToken();
+		AuthData auth = da.findAuth(authToken);
 		if (null == auth)
 			throw new DataAccessException("no active session");
-		da.deleteAuth(req.authToken);
+		da.deleteAuth(authToken);
 		return new LogoutResult(true);
 	}
 
@@ -53,7 +59,6 @@ public class UserService {
 	}
 
 	private static boolean validateCredentials(String username, String password, UserData user) {
-		if (!username.equals(user.username) || !password.equals(user.password)) return false;
-		return true;
+		return username.equals(user.username()) && password.equals(user.password());
 	}
 }
