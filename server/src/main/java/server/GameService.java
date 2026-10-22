@@ -32,7 +32,7 @@ public class GameService {
 		ChessGame gameObject = new ChessGame();
 		GameData gameData = new GameData(gameID, username, null, gameName, gameObject);
 		da.addGame(gameData);
-		return new CreateGameResult(gameData);
+		return new CreateGameResult(gameData, gameID);
 	}
 
 	public JoinGameResult joinGame(JoinGameRequest req) throws DataAccessException {

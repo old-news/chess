@@ -65,6 +65,7 @@ public class Server {
     private void createGame(io.javalin.http.Context ctx) {
 	    HandlerResult res = handler.createGame(ctx.header("authorization"), ctx.body());
 	    updateCTX(ctx, res);
+	    // return ((GameData) res.body().get("game")).gameID();
     }
 
     private void joinGame(io.javalin.http.Context ctx) {

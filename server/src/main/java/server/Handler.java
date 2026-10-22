@@ -62,7 +62,7 @@ public class Handler {
 			if (e.getMessage().equals("wrong username")) {
 				status = 401;
 			} else if (e.getMessage().equals("invalid credentials")) {
-				status = 403;
+				status = 401;
 			}
 		}
 		return new HandlerResult(status, body);
@@ -80,7 +80,7 @@ public class Handler {
 			body = Map.of("success", java.lang.Boolean.toString(res.succeeded()));
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
-			status = 404;
+			status = 401;
 		}
 		return new HandlerResult(status, body);
 	}
@@ -112,7 +112,7 @@ public class Handler {
 		}
 		try {
 			CreateGameResult res = gs.createGame(req);
-			body = Map.of("game", res.game());
+			body = Map.of("game", res.game(), "gameID", res.gameID());
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
