@@ -1,6 +1,6 @@
 package server;
 
 public record AuthData(
-	String authToken,
-	String username
+	String username,
+	String authToken
 ) {};

@@ -23,10 +23,12 @@ public class GameService {
 	}
 
 	public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException {
-		AuthData auth = da.findAuth(req.authToken());
-		if (null == auth)
-			throw new DataAccessException("not logged in");
-		String username = auth.username();
+		/*
+		 * AuthData auth = da.findAuth(req.authToken());
+		 * if (null == auth)
+			 * throw new DataAccessException("not logged in");
+			 */
+		String username = "";//auth.username();
 		String gameName = req.gameName();
 		int gameID = generateGameID();
 		ChessGame gameObject = new ChessGame();

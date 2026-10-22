@@ -16,11 +16,17 @@ public class Handler {
 	private final Gson serializer;
 
 	public Handler() {
-		da = new DataAccess();
+		da = new RamAccess();
 		us = new UserService(da);
 		gs = new GameService(da);
 		cs = new ClearService(da);
 		serializer = new Gson();
+	}
+
+	private HandlerResult HandlerError(int status, String message) {
+		Map<String, String> bodyItem = Map.of("message", "Error: " + message);
+		String body = serializer.toJson(bodyItem);
+		return new HandlerResult(status, body);
 	}
 
 	public HandlerResult registerUser(String requestBody) {
@@ -28,6 +34,9 @@ public class Handler {
 		Map<String, String> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		RegisterRequest req = new RegisterRequest((String) request.get("username"), (String) request.get("password"), (String) request.get("email"));
+		if (null == req.username() || null == req.password() || null == req.email()) {
+			return HandlerError(400, "Malformed request");
+		}
 		try {
 			RegisterResult res = us.registerUser(req);
 			bodyItem = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
@@ -44,6 +53,9 @@ public class Handler {
 		Map<String, String> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		LoginRequest req = new LoginRequest((String) request.get("username"), (String) request.get("password"));
+		if (null == req.username()|| null == req.password()) {
+			return HandlerError(400, "Malformed request");
+		}
 		try {
 			LoginResult res = us.login(req);
 			bodyItem = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
@@ -64,6 +76,9 @@ public class Handler {
 		Map<String, String> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		LogoutRequest req = new LogoutRequest((String) request.get("authToken"));
+		if (null == req.authToken()) {
+			return HandlerError(400, "Malformed request");
+		}
 		try {
 			LogoutResult res = us.logout(req);
 			bodyItem = Map.of("success", java.lang.Boolean.toString(res.succeeded()));
@@ -80,6 +95,9 @@ public class Handler {
 		Map<String, Object> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		ListGamesRequest req = new ListGamesRequest((String) request.get("authToken"));
+		if (null == req.authToken()) {
+			return HandlerError(400, "Malformed request");
+		}
 		try {
 			ListGamesResult res = gs.listGames(req);
 			bodyItem = Map.of("games", res.games());
@@ -96,6 +114,9 @@ public class Handler {
 		Map<String, String> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		CreateGameRequest req = new CreateGameRequest((String) request.get("authToken"), (String) request.get("gameName"));
+		if (null == req.gameName()) {
+			return HandlerError(400, "Malformed request");
+		}
 		try {
 			CreateGameResult res = gs.createGame(req);
 			bodyItem = Map.of("game", res.game().toString());
@@ -131,13 +152,13 @@ public class Handler {
 		int status = 200;
 		Map<String, String> bodyItem;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		try {
+//		try {
 			ClearDBResult res = cs.clearDB();
 			bodyItem = Map.of("succeeded", java.lang.Boolean.toString(res.success()));
-		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
-			status = 400;
-		}
+//		} catch (DataAccessException e) {
+//			bodyItem = Map.of("message", "Error: " + e.getMessage());
+//			status = 400;
+//		}
 		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}

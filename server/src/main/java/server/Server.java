@@ -14,14 +14,14 @@ public class Server {
         // Register your endpoints and exception handlers here.
 
 	javalin.post("/user", ctx -> registerUser(ctx));
-	javalin.post("/login", ctx -> login(ctx));
-	javalin.delete("/logout", ctx -> logout(ctx));
+	javalin.post("/session", ctx -> login(ctx));
+	javalin.delete("/session", ctx -> logout(ctx));
 	javalin.get("/game", ctx -> listGames(ctx));
 	javalin.post("/game", ctx -> createGame(ctx));
 	javalin.put("/game", ctx -> joinGame(ctx));
 	javalin.delete("/db", ctx -> clearDB(ctx));
 
-	run(8080);
+	// run(8080);
     }
 
     public int run(int desiredPort) {

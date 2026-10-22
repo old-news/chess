@@ -15,7 +15,7 @@ public class UserService {
 		String username = req.username();
 		String password = req.password();
 		String email = req.email();
-		UserData user = da.getUser(username);
+		UserData user = da.findUser(username);
 		if (null != user)
 			throw new DataAccessException("username already taken");
 		user = new UserData(username, password, email);
@@ -28,7 +28,7 @@ public class UserService {
 	public LoginResult login(LoginRequest req) throws DataAccessException {
 		String username = req.username();
 		String password = req.password();
-		UserData user = da.getUser(username);
+		UserData user = da.findUser(username);
 		if (null == user)
 			throw new DataAccessException("wrong username");
 		boolean credentialsAreValid = validateCredentials(username, password, user);

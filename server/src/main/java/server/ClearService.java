@@ -13,6 +13,6 @@ public class ClearService {
 		da.clearAuth();
 		da.clearGames();
 		da.clearUsers();
-		return new DeleteDBResult(true);
+		return new ClearDBResult(true);
 	}
 }
