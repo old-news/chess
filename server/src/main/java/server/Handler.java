@@ -32,10 +32,10 @@ public class Handler {
 		int status = 200;
 		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		RegisterRequest req = new RegisterRequest((String) request.get("username"), (String) request.get("password"), (String) request.get("email"));
-		if (null == req.username() || null == req.password() || null == req.email()) {
+		if (null == request.get("username") || null == request.get("password") || null == request.get("email")) {
 			return HandlerError(400, "Malformed request");
 		}
+		RegisterRequest req = new RegisterRequest((String) request.get("username"), (String) request.get("password"), (String) request.get("email"));
 		try {
 			RegisterResult res = us.registerUser(req);
 			body = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
@@ -50,10 +50,10 @@ public class Handler {
 		int status = 200;
 		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		LoginRequest req = new LoginRequest((String) request.get("username"), (String) request.get("password"));
-		if (null == req.username()|| null == req.password()) {
+		if (null == request.get("username") || null == request.get("password")) {
 			return HandlerError(400, "Malformed request");
 		}
+		LoginRequest req = new LoginRequest((String) request.get("username"), (String) request.get("password"));
 		try {
 			LoginResult res = us.login(req);
 			body = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
@@ -71,10 +71,10 @@ public class Handler {
 	public HandlerResult logout(String authToken) {
 		int status = 200;
 		Map<String, Object> body;
-		LogoutRequest req = new LogoutRequest(authToken);
-		if (null == req.authToken()) {
+		if (null == authToken) {
 			return HandlerError(400, "Malformed request");
 		}
+		LogoutRequest req = new LogoutRequest(authToken);
 		try {
 			LogoutResult res = us.logout(req);
 			body = Map.of("success", java.lang.Boolean.toString(res.succeeded()));
@@ -88,10 +88,10 @@ public class Handler {
 	public HandlerResult listGames(String authToken) {
 		int status = 200;
 		Map<String, Object> body;
-		ListGamesRequest req = new ListGamesRequest(authToken);
-		if (null == req.authToken()) {
+		if (null == authToken) {
 			return HandlerError(400, "Malformed request");
 		}
+		ListGamesRequest req = new ListGamesRequest(authToken);
 		try {
 			ListGamesResult res = gs.listGames(req);
 			body = Map.of("games", res.games());
@@ -106,10 +106,10 @@ public class Handler {
 		int status = 200;
 		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		CreateGameRequest req = new CreateGameRequest(authToken, (String) request.get("gameName"));
-		if (null == authToken || null == req.gameName()) {
+		if (null == authToken || null == request.get("gameName")) {
 			return HandlerError(400, "Malformed request");
 		}
+		CreateGameRequest req = new CreateGameRequest(authToken, (String) request.get("gameName"));
 		try {
 			CreateGameResult res = gs.createGame(req);
 			body = Map.of("game", res.game(), "gameID", res.gameID());
@@ -124,6 +124,9 @@ public class Handler {
 		int status = 200;
 		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
+		if (null == authToken || null == request.get("gameID")) {
+			return HandlerError(400, "Malformed request");
+		}
 		JoinGameRequest req = new JoinGameRequest(authToken, (String) request.get("playerColor"), ((Number) request.get("gameID")).intValue());
 		try {
 			JoinGameResult res = gs.joinGame(req);
@@ -134,6 +137,7 @@ public class Handler {
 				case "not logged in" -> status = 401;
 				case "game not found" -> status = 404;
 				case "color already taken" -> status = 403;
+				case "invalid join color" -> status = 400;
 			}
 		}
 		return new HandlerResult(status, body);

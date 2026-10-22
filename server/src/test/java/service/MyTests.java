@@ -57,7 +57,7 @@ public class MyTests {
 		assertEquals(200, res.status());
 		assertNotNull(res.body().get("username"));
 		assertNotNull(res.body().get("authToken"));
-        hand.logout((String) res.body().get("authToken"));
+        	hand.logout((String) res.body().get("authToken"));
 	}
 
 	@Test
@@ -84,13 +84,15 @@ public class MyTests {
 	public void createWorks() {
 		String req = formatRequest(Map.of("username", "admin", "password", "abc"));
 		HandlerResult res = hand.login(req);
+
 		currAuth = (String) res.body().get("authToken");
 		req = formatRequest(Map.of("gameName", "pickles"));
 		res = hand.createGame(currAuth, req);
 		assertEquals(200, res.status());
 		assertNotNull(res.body().get("game"));
 		GameData game = (GameData) res.body().get("game");
-		assertNotNull(game.whiteUsername());
+		assertNull(game.whiteUsername());
+		assertNull(game.blackUsername());
 		currID = game.gameID();
 	}
 
@@ -105,11 +107,46 @@ public class MyTests {
 	@Test
 	@Order(6)
 	public void joinWorks() {
-		String req = formatRequest(Map.of("playerColor", "black", "gameID", currID));
-		HandlerResult res = hand.joinGame(currAuth, req);
+		String req = formatRequest(Map.of("username", "noob", "password", "noobpass", "email", "noob@noobmail.com"));
+		HandlerResult res = hand.registerUser(req);
+		String noobAuth = (String) res.body().get("authToken");
+
+		req = formatRequest(Map.of("playerColor", "black", "gameID", currID));
+		res = hand.joinGame(noobAuth, req);
 		assertEquals(200, res.status());
 		assertNotNull(res.body().get("game"));
 		GameData game = (GameData) res.body().get("game");
+		assertEquals("noob", game.blackUsername());
+	}
+
+	@Test
+	@Order(7)
+	public void joinWrongColorFails() {
+		String req = formatRequest(Map.of("playerColor", "black", "gameID", currID));
+		HandlerResult res = hand.joinGame(currAuth, req);
+		assertNotEquals(200, res.status());
+	}
+
+	@Test
+	@Order(8)
+	public void doubleJoinWorks() {
+		String req = formatRequest(Map.of("gameName", "potato"));
+		HandlerResult res = hand.createGame(currAuth, req);
+		GameData game = (GameData) res.body().get("game");
+		int gameID = (int) game.gameID();
+
+		req = formatRequest(Map.of("playerColor", "white", "gameID", gameID));
+		res = hand.joinGame(currAuth, req);
+		assertEquals(200, res.status());
+
+		req = formatRequest(Map.of("playerColor", "black", "gameID", gameID));
+		res = hand.joinGame(currAuth, req);
+		assertEquals(200, res.status());
+
+		assertNotNull(res.body().get("game"));
+		game = (GameData) res.body().get("game");
+		assertEquals("admin", game.whiteUsername());
 		assertEquals("admin", game.blackUsername());
+		// currID = game.gameID();
 	}
 }

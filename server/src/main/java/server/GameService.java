@@ -30,7 +30,7 @@ public class GameService {
 		String gameName = req.gameName();
 		int gameID = generateGameID();
 		ChessGame gameObject = new ChessGame();
-		GameData gameData = new GameData(gameID, username, null, gameName, gameObject);
+		GameData gameData = new GameData(gameID, null, null, gameName, gameObject);
 		da.addGame(gameData);
 		return new CreateGameResult(gameData, gameID);
 	}
@@ -51,6 +51,9 @@ public class GameService {
 	}
 
 	private static boolean checkColorTaken(String playerColor, GameData game) {
+		if (null == playerColor)
+			return false;
+		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
 			return null != game.whiteUsername();
 		} else if (playerColor.equals("black")) {
@@ -60,6 +63,14 @@ public class GameService {
 	}
 
 	private static GameData addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
+		/*
+		 * if (username == game.whiteUsername() || username == game.blackUsername()) {
+			 * game = new GameData(game.gameID(), null, null, game.gameName(), game.game());
+		 * }
+		 */
+		if (null == playerColor)
+			throw new DataAccessException("invalid join color");
+		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
 			return new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
 		} else if (playerColor.equals("black")) {
@@ -71,7 +82,7 @@ public class GameService {
 	private int generateGameID() {
 		int id = 0;
 		do {
-			id += (new Random()).nextInt((int) Math.pow(2, 30));
+			id += (new Random()).nextInt((int) Math.pow(2, 31) - 1);
 		} while (null != da.findGame(id));
 		return id;
 	}
