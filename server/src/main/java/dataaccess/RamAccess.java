@@ -11,7 +11,7 @@ public class RamAccess implements DataAccess {
 	private Map<String, AuthData> auths;
 	private Map<Integer, GameData> games;
 
-	void RamAccess() {
+	public RamAccess() {
 		users = new HashMap<>();
 		auths = new HashMap<>();
 		games = new HashMap<>();

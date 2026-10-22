@@ -24,14 +24,13 @@ public class Handler {
 	}
 
 	private HandlerResult HandlerError(int status, String message) {
-		Map<String, String> bodyItem = Map.of("message", "Error: " + message);
-		String body = serializer.toJson(bodyItem);
+		Map<String, Object> body = Map.of("message", "Error: " + message);
 		return new HandlerResult(status, body);
 	}
 
 	public HandlerResult registerUser(String requestBody) {
 		int status = 200;
-		Map<String, String> bodyItem;
+		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		RegisterRequest req = new RegisterRequest((String) request.get("username"), (String) request.get("password"), (String) request.get("email"));
 		if (null == req.username() || null == req.password() || null == req.email()) {
@@ -39,18 +38,17 @@ public class Handler {
 		}
 		try {
 			RegisterResult res = us.registerUser(req);
-			bodyItem = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
+			body = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			status = 403;
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
 	public HandlerResult login(String requestBody) {
 		int status = 200;
-		Map<String, String> bodyItem;
+		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
 		LoginRequest req = new LoginRequest((String) request.get("username"), (String) request.get("password"));
 		if (null == req.username()|| null == req.password()) {
@@ -58,108 +56,99 @@ public class Handler {
 		}
 		try {
 			LoginResult res = us.login(req);
-			bodyItem = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
+			body = Map.of("username", res.auth().username(), "authToken", res.auth().authToken());
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			if (e.getMessage().equals("wrong username")) {
 				status = 4001;
 			} else if (e.getMessage().equals("invalid credentials")) {
 				status = 401;
 			}
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
-	public HandlerResult logout(String requestBody) {
+	public HandlerResult logout(String authToken) {
 		int status = 200;
-		Map<String, String> bodyItem;
-		var request = serializer.fromJson(requestBody, HashMap.class);
-		LogoutRequest req = new LogoutRequest((String) request.get("authToken"));
+		Map<String, Object> body;
+		LogoutRequest req = new LogoutRequest(authToken);
 		if (null == req.authToken()) {
 			return HandlerError(400, "Malformed request");
 		}
 		try {
 			LogoutResult res = us.logout(req);
-			bodyItem = Map.of("success", java.lang.Boolean.toString(res.succeeded()));
+			body = Map.of("success", java.lang.Boolean.toString(res.succeeded()));
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			status = 404;
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
-	public HandlerResult listGames(String requestBody) {
+	public HandlerResult listGames(String authToken) {
 		int status = 200;
-		Map<String, Object> bodyItem;
-		var request = serializer.fromJson(requestBody, HashMap.class);
-		ListGamesRequest req = new ListGamesRequest((String) request.get("authToken"));
+		Map<String, Object> body;
+		ListGamesRequest req = new ListGamesRequest(authToken);
 		if (null == req.authToken()) {
 			return HandlerError(400, "Malformed request");
 		}
 		try {
 			ListGamesResult res = gs.listGames(req);
-			bodyItem = Map.of("games", res.games());
+			body = Map.of("games", res.games());
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
-	public HandlerResult createGame(String requestBody) {
+	public HandlerResult createGame(String authToken, String requestBody) {
 		int status = 200;
-		Map<String, String> bodyItem;
+		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		CreateGameRequest req = new CreateGameRequest((String) request.get("authToken"), (String) request.get("gameName"));
-		if (null == req.gameName()) {
+		CreateGameRequest req = new CreateGameRequest(authToken, (String) request.get("gameName"));
+		if (null == authToken || null == req.gameName()) {
 			return HandlerError(400, "Malformed request");
 		}
 		try {
 			CreateGameResult res = gs.createGame(req);
-			bodyItem = Map.of("game", res.game().toString());
+			body = Map.of("game", res.game().toString());
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
-	public HandlerResult joinGame(String requestBody) {
+	public HandlerResult joinGame(String authToken, String requestBody) {
 		int status = 200;
-		Map<String, String> bodyItem;
+		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		JoinGameRequest req = new JoinGameRequest((String) request.get("authToken"), (String) request.get("playerColor"), (int) request.get("gameID"));
+		JoinGameRequest req = new JoinGameRequest(authToken, (String) request.get("playerColor"), (int) request.get("gameID"));
 		try {
 			JoinGameResult res = gs.joinGame(req);
-			bodyItem = Map.of("game", res.game().toString());
+			body = Map.of("game", res.game().toString());
 		} catch (DataAccessException e) {
-			bodyItem = Map.of("message", "Error: " + e.getMessage());
+			body = Map.of("message", "Error: " + e.getMessage());
 			switch (e.getMessage()) {
 				case "not logged in" -> status = 401;
 				case "game not found" -> status = 404;
 				case "color already taken" -> status = 403;
 			}
 		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 
-	public HandlerResult clearDB(String requestBody) {
+	public HandlerResult clearDB() {
 		int status = 200;
-		Map<String, String> bodyItem;
-		var request = serializer.fromJson(requestBody, HashMap.class);
+		Map<String, Object> body;
 //		try {
 			ClearDBResult res = cs.clearDB();
-			bodyItem = Map.of("succeeded", java.lang.Boolean.toString(res.success()));
+			body = Map.of("succeeded", java.lang.Boolean.toString(res.success()));
 //		} catch (DataAccessException e) {
 //			bodyItem = Map.of("message", "Error: " + e.getMessage());
 //			status = 400;
 //		}
-		String body = serializer.toJson(bodyItem);
 		return new HandlerResult(status, body);
 	}
 

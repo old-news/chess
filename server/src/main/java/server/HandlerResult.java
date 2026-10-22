@@ -1,3 +1,5 @@
 package server;
 
-public record HandlerResult(int status, String body) {};
+import java.util.Map;
+
+public record HandlerResult(int status, Map<String, Object> body) {};

@@ -1,14 +1,17 @@
 package server;
 
+import com.google.gson.Gson;
 import io.javalin.*;
 
 public class Server {
 
     private final Javalin javalin;
     private final Handler handler;
+    private final Gson serializer;
 
     public Server() {
 	    handler = new Handler();
+	    serializer = new Gson();
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -35,7 +38,8 @@ public class Server {
 
     private void updateCTX(io.javalin.http.Context ctx, HandlerResult res) {
 	    ctx.status(res.status());
-	    ctx.result(res.body());
+	    String jsonified = serializer.toJson(res.body());
+	    ctx.result(jsonified);
     }
 
     private void registerUser(io.javalin.http.Context ctx) {
@@ -49,27 +53,27 @@ public class Server {
     }
 
     private void logout(io.javalin.http.Context ctx) {
-	    HandlerResult res = handler.logout(ctx.body());
+	    HandlerResult res = handler.logout(ctx.header("authorization"));
 	    updateCTX(ctx, res);
     }
 
     private void listGames(io.javalin.http.Context ctx) {
-	    HandlerResult res = handler.listGames(ctx.body());
+	    HandlerResult res = handler.listGames(ctx.header("authorization"));
 	    updateCTX(ctx, res);
     }
 
     private void createGame(io.javalin.http.Context ctx) {
-	    HandlerResult res = handler.createGame(ctx.body());
+	    HandlerResult res = handler.createGame(ctx.header("authorization"), ctx.body());
 	    updateCTX(ctx, res);
     }
 
     private void joinGame(io.javalin.http.Context ctx) {
-	    HandlerResult res = handler.joinGame(ctx.body());
+	    HandlerResult res = handler.joinGame(ctx.header("authorization"), ctx.body());
 	    updateCTX(ctx, res);
     }
 
     private void clearDB(io.javalin.http.Context ctx) {
-	    HandlerResult res = handler.clearDB(ctx.body());
+	    HandlerResult res = handler.clearDB();
 	    updateCTX(ctx, res);
     }
 }
