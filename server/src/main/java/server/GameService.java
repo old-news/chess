@@ -16,16 +16,18 @@ public class GameService {
 	public ListGamesResult listGames(ListGamesRequest req) throws DataAccessException {
 		String authToken = req.authToken();
 		AuthData auth = da.findAuth(authToken);
-		if (null == auth)
+		if (null == auth) {
 			throw new DataAccessException("not logged in");
+		}
 		Collection<GameData> games = da.getGames();
 		return new ListGamesResult(games);
 	}
 
 	public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException {
 		AuthData auth = da.findAuth(req.authToken());
-		if (null == auth)
+		if (null == auth) {
 			throw new DataAccessException("not logged in");
+		}
 		String username = auth.username();
 		String gameName = req.gameName();
 		int gameID = generateGameID();
@@ -37,22 +39,26 @@ public class GameService {
 
 	public JoinGameResult joinGame(JoinGameRequest req) throws DataAccessException {
 		AuthData auth = da.findAuth(req.authToken());
-		if (null == auth)
+		if (null == auth) {
 			throw new DataAccessException("not logged in");
+		}
 		GameData game = da.findGame(req.gameID());
-		if (null == game)
+		if (null == game) {
 			throw new DataAccessException("game not found");
+		}
 		boolean isColorTaken = checkColorTaken(req.playerColor(), game);
-		if (isColorTaken)
+		if (isColorTaken) {
 			throw new DataAccessException("color already taken");
+		}
 		GameData joinedGame = addUserToGame(auth.username(), req.playerColor(), game);
 		da.overwriteGame(joinedGame);
 		return new JoinGameResult(joinedGame);
 	}
 
 	private static boolean checkColorTaken(String playerColor, GameData game) {
-		if (null == playerColor)
+		if (null == playerColor) {
 			return false;
+		}
 		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
 			return null != game.whiteUsername();
@@ -68,8 +74,9 @@ public class GameService {
 			 * game = new GameData(game.gameID(), null, null, game.gameName(), game.game());
 		 * }
 		 */
-		if (null == playerColor)
+		if (null == playerColor) {
 			throw new DataAccessException("invalid join color");
+		}
 		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
 			return new GameData(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());

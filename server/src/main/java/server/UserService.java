@@ -16,8 +16,9 @@ public class UserService {
 		String password = req.password();
 		String email = req.email();
 		UserData user = da.findUser(username);
-		if (null != user)
+		if (null != user) {
 			throw new DataAccessException("username already taken");
+		}
 		user = new UserData(username, password, email);
 		AuthData auth = generateAuth(username);
 		da.addUser(user);
@@ -29,11 +30,13 @@ public class UserService {
 		String username = req.username();
 		String password = req.password();
 		UserData user = da.findUser(username);
-		if (null == user)
+		if (null == user) {
 			throw new DataAccessException("wrong username");
+		}
 		boolean credentialsAreValid = validateCredentials(username, password, user);
-		if (!credentialsAreValid)
+		if (!credentialsAreValid) {
 			throw new DataAccessException("invalid credentials");
+		}
 		AuthData auth = generateAuth(username);
 		da.addAuth(auth);
 		return new LoginResult(auth);
@@ -43,8 +46,9 @@ public class UserService {
 	public LogoutResult logout(LogoutRequest req) throws DataAccessException {
 		String authToken = req.authToken();
 		AuthData auth = da.findAuth(authToken);
-		if (null == auth)
+		if (null == auth) {
 			throw new DataAccessException("no active session");
+		}
 		da.deleteAuth(authToken);
 		return new LogoutResult(true);
 	}
