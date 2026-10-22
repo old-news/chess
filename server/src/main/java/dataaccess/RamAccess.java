@@ -22,7 +22,7 @@ public class RamAccess implements DataAccess {
 	}
 
 	public AuthData findAuth(String authToken) {
-		return auths.getOrDefault(authToken, null);
+		return auths.get(authToken);
 	}
 
 	public GameData findGame(int gameID) {

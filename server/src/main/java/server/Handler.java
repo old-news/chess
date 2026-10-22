@@ -60,9 +60,9 @@ public class Handler {
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			if (e.getMessage().equals("wrong username")) {
-				status = 4001;
-			} else if (e.getMessage().equals("invalid credentials")) {
 				status = 401;
+			} else if (e.getMessage().equals("invalid credentials")) {
+				status = 403;
 			}
 		}
 		return new HandlerResult(status, body);
@@ -112,7 +112,7 @@ public class Handler {
 		}
 		try {
 			CreateGameResult res = gs.createGame(req);
-			body = Map.of("game", res.game().toString());
+			body = Map.of("game", res.game());
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
@@ -124,10 +124,10 @@ public class Handler {
 		int status = 200;
 		Map<String, Object> body;
 		var request = serializer.fromJson(requestBody, HashMap.class);
-		JoinGameRequest req = new JoinGameRequest(authToken, (String) request.get("playerColor"), (int) request.get("gameID"));
+		JoinGameRequest req = new JoinGameRequest(authToken, (String) request.get("playerColor"), ((Number) request.get("gameID")).intValue());
 		try {
 			JoinGameResult res = gs.joinGame(req);
-			body = Map.of("game", res.game().toString());
+			body = Map.of("game", res.game());
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			switch (e.getMessage()) {

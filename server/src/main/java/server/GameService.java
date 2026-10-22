@@ -23,16 +23,15 @@ public class GameService {
 	}
 
 	public CreateGameResult createGame(CreateGameRequest req) throws DataAccessException {
-		/*
-		 * AuthData auth = da.findAuth(req.authToken());
-		 * if (null == auth)
-			 * throw new DataAccessException("not logged in");
-			 */
-		String username = "";//auth.username();
+		AuthData auth = da.findAuth(req.authToken());
+		if (null == auth)
+			throw new DataAccessException("not logged in");
+		String username = auth.username();
 		String gameName = req.gameName();
 		int gameID = generateGameID();
 		ChessGame gameObject = new ChessGame();
 		GameData gameData = new GameData(gameID, username, null, gameName, gameObject);
+		da.addGame(gameData);
 		return new CreateGameResult(gameData);
 	}
 
@@ -43,21 +42,21 @@ public class GameService {
 		GameData game = da.findGame(req.gameID());
 		if (null == game)
 			throw new DataAccessException("game not found");
-		boolean isColorTaken = checkColorNotTaken(req.playerColor(), game);
-		if (true == isColorTaken)
+		boolean isColorTaken = checkColorTaken(req.playerColor(), game);
+		if (isColorTaken)
 			throw new DataAccessException("color already taken");
 		GameData joinedGame = addUserToGame(auth.username(), req.playerColor(), game);
 		da.overwriteGame(joinedGame);
 		return new JoinGameResult(joinedGame);
 	}
 
-	private static boolean checkColorNotTaken(String playerColor, GameData game) {
+	private static boolean checkColorTaken(String playerColor, GameData game) {
 		if (playerColor.equals("white")) {
-			return null == game.whiteUsername();
+			return null != game.whiteUsername();
 		} else if (playerColor.equals("black")) {
-			return null == game.blackUsername();
+			return null != game.blackUsername();
 		}
-		return true;
+		return false;
 	}
 
 	private static GameData addUserToGame(String username, String playerColor, GameData game) throws DataAccessException {
@@ -72,7 +71,7 @@ public class GameService {
 	private int generateGameID() {
 		int id = 0;
 		do {
-			id += (new Random()).nextInt((int) Math.pow(2, 31));
+			id += (new Random()).nextInt((int) Math.pow(2, 30));
 		} while (null != da.findGame(id));
 		return id;
 	}
