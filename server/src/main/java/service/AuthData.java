@@ -1,4 +1,4 @@
-package server;
+package service;
 
 public record AuthData(
 	String username,

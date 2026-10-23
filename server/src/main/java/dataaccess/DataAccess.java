@@ -1,6 +1,6 @@
 package dataaccess;
 
-import server.*;
+import service.*;
 import java.util.Collection;
 
 public interface DataAccess {

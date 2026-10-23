@@ -1,3 +1,3 @@
-package server;
+package service;
 
 public record RegisterResult(AuthData auth) {};

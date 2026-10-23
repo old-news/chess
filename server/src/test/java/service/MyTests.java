@@ -2,6 +2,7 @@ package service;
 
 import server.*;
 import dataaccess.*;
+import service.*;
 import chess.ChessGame;
 
 import com.google.gson.Gson;
