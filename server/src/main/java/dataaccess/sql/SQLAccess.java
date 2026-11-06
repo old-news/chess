@@ -13,14 +13,16 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
-class SQLAccess {
+public class SQLAccess implements DataAccess {
 
-	public SQLAccess () throws DataAccessException {
+	public SQLAccess () {
 		setupDatabase();
 	}
 
-	private void setupDatabase () throws DataAccessException {
-		DatabaseManager.createDatabase();
+	private void setupDatabase () {
+		try {
+			DatabaseManager.createDatabase();
+		} catch (DataAccessException e) {}
 		runStatements(List.of(
 				"""
 				CREATE TABLE IF NOT EXISTS users (
@@ -75,6 +77,9 @@ class SQLAccess {
 
 	private List<Object> runQuery(String statement, List<String> keys) {
 		var response = runStatement(statement);
+		if (null == response) {
+			return new ArrayList<>();
+		}
 		try {
 			response.next();
 		} catch (java.sql.SQLException e) {
@@ -96,16 +101,25 @@ class SQLAccess {
 
 	public UserData findUser(String username) {
 		List<Object> data = runQuery(String.format("SELECT * FROM users WHERE Username = '%s'", username), List.of("Username", "Password", "Email"));
+		if (data.isEmpty()) {
+			return null;
+		}
 		return new UserData((String) data.get(0), (String) data.get(1), (String) data.get(2));
 	}
 
 	public AuthData findAuth(String authToken) {
 		List<Object> data = runQuery(String.format("SELECT * FROM auths WHERE AuthToken = '%s'", authToken), List.of("Username", "AuthToken"));
+		if (data.isEmpty()) {
+			return null;
+		}
 		return new AuthData((String) data.get(0), (String) data.get(1));
 	}
 
 	public GameData findGame(int gameID) {
 		List<Object> data = runQuery(String.format("SELECT * FROM games WHERE GameID = %d", gameID), List.of("GameID", "WhiteUsername", "BlackUsername", "GameName", "GameObject"));
+		if (data.isEmpty()) {
+			return null;
+		}
 		ChessGame gameObject = (new Gson()).fromJson((String) data.get(4), ChessGame.class);
 		return new GameData((int) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
 	}
@@ -162,7 +176,7 @@ class SQLAccess {
 		runStatement("DELETE FROM users");
 	}
 
-	public void clearAuths() {
+	public void clearAuth() {
 		runStatement("DELETE FROM auths");
 	}
 
@@ -170,7 +184,4 @@ class SQLAccess {
 		runStatement("DELETE FROM games");
 	}
 
-	public static boolean validatePassword(String plainTextPassword, String passwordHash) {
-		return BCrypt.checkpw(plainTextPassword, passwordHash);
-	}
 }

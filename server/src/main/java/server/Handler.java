@@ -1,6 +1,7 @@
 package server;
 
 import dataaccess.*;
+import dataaccess.sql.*;
 import service.*;
 import com.google.gson.Gson;
 
@@ -17,7 +18,7 @@ public class Handler {
 	private final Gson serializer;
 
 	public Handler() {
-		da = new RamAccess();
+		da = new SQLAccess();
 		us = new UserService(da);
 		gs = new GameService(da);
 		cs = new ClearService(da);

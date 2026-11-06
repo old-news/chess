@@ -2,6 +2,7 @@ package dataaccess;
 
 import service.*;
 import java.util.Collection;
+import org.mindrot.jbcrypt.BCrypt;
 
 public interface DataAccess {
 	public UserData findUser(String username);
@@ -16,4 +17,9 @@ public interface DataAccess {
 	public void clearUsers();
 	public void clearAuth();
 	public void clearGames();
+	// public static boolean validatePassword(String plainTextPassword, String passwordHash);
+
+	public static boolean validatePassword(String plainTextPassword, String passwordHash) {
+		return BCrypt.checkpw(plainTextPassword, passwordHash);
+	}
 }
