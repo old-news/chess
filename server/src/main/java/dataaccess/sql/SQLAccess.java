@@ -1,6 +1,7 @@
 package dataaccess.sql;
 
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 import service.*;
 import chess.ChessGame;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import com.google.gson.Gson;
+import org.mindrot.jbcrypt.BCrypt;
 
 class SQLAccess {
 
@@ -130,6 +132,7 @@ class SQLAccess {
 	}
 
 	public void addUser(UserData user) {
+		String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
 		runStatement(String.format("INSERT INTO users VALUES (%s, %s, %s)", user.username(), user.password(), user.email()));
 	}
 
@@ -165,5 +168,9 @@ class SQLAccess {
 
 	public void clearGames() {
 		runStatement("DELETE FROM games");
+	}
+
+	public static boolean validatePassword(String plainTextPassword, String passwordHash) {
+		return BCrypt.checkpw(plainTextPassword, passwordHash);
 	}
 }

@@ -63,6 +63,6 @@ public class UserService {
 	}
 
 	private static boolean validateCredentials(String username, String password, UserData user) {
-		return username.equals(user.username()) && password.equals(user.password());
+		return username.equals(user.username()) && da.validatePassword(password, user.password);
 	}
 }
