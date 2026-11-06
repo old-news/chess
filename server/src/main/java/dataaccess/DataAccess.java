@@ -9,11 +9,11 @@ public interface DataAccess {
 	public GameData findGame(int gameID);
 	public Collection<GameData> getGames();
 	public void addUser(UserData user);
-	public void addGame(GameData game);
 	public void addAuth(AuthData auth);
+	public void addGame(GameData game);
 	public void overwriteGame(GameData game);
 	public void deleteAuth(String authToken);
 	public void clearUsers();
-	public void clearGames();
 	public void clearAuth();
+	public void clearGames();
 }
