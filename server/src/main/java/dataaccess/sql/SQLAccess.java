@@ -3,11 +3,13 @@ package dataaccess.sql;
 import dataaccess.*;
 import server.*;
 import service.*;
+import chess.ChessGame;
 
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+import com.google.gson.Gson;
 
 class SQLAccess {
 
@@ -102,21 +104,27 @@ class SQLAccess {
 
 	public GameData findGame(int gameID) {
 		List<Object> data = runQuery(String.format("SELECT * FROM games WHERE GameID = %d", gameID), List.of("GameID", "WhiteUsername", "BlackUsername", "GameName", "GameObject"));
-		return new GameData((int) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), (String) data.get(4));
+		ChessGame gameObject = (new Gson()).fromJson((String) data.get(4), ChessGame.class);
+		return new GameData((int) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
 	}
 
 	public Collection<GameData> getGames() {
 		var response = runStatement("SELECT * FROM games");
 		Collection<GameData> games = new ArrayList<>();
-		while (response.next()) {
-			GameData data = new GameData(
-					response.getInt(1),
-					response.getString("WhiteUsername"),
-					response.getString("BlackUsername"),
-					response.getString("GameName"),
-					response.getString("GameObject"),
-			);
-			games.add(data);
+		try {
+			while (response.next()) {
+				ChessGame gameObject = (new Gson()).fromJson(response.getString("GameObject"), ChessGame.class);
+				GameData data = new GameData(
+						response.getInt(1),
+						response.getString("WhiteUsername"),
+						response.getString("BlackUsername"),
+						response.getString("GameName"),
+						gameObject
+				);
+				games.add(data);
+			}
+		} catch (java.sql.SQLException e) {
+			return games;
 		}
 		return games;
 	}
