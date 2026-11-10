@@ -62,9 +62,9 @@ public class GameService {
 		}
 		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
-			return null != game.whiteUsername() && !"null".equals(game.whiteUsername());
+			return null != game.whiteUsername();
 		} else if (playerColor.equals("black")) {
-			return null != game.blackUsername() && !"null".equals(game.blackUsername());
+			return null != game.blackUsername();
 		}
 		return false;
 	}

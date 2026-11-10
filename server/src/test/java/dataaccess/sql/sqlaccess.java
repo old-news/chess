@@ -96,6 +96,14 @@ public class sqlaccess {
 
 	@Test
 	@Order(5)
+	public void fakeLookupFails() {
+		assertNull(da.findUser("jim"));
+		assertNull(da.findGame(2));
+		assertNull(da.findAuth("afeuwafafewafaew"));
+	}
+
+	@Test
+	@Order(98)
 	public void deleteAuthWorks() {
 		String tok = auths.get(0);
 		da.deleteAuth(tok);
@@ -104,7 +112,7 @@ public class sqlaccess {
 	}
 
 	@Test
-	@Order(6)
+	@Order(99)
 	public void clearWorks() {
 		clear();
 		assertEquals(da.getGames().size(), 0);

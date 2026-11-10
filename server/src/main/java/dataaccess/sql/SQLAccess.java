@@ -102,7 +102,7 @@ public class SQLAccess implements DataAccess {
 				response = preparedStatement.executeQuery();
 				try {
 					response.next();
-				} catch (java.sql.SQLException e) {
+				} catch (Exception e) {
 					return new ArrayList<>();
 				}
 				List<Object> values = new ArrayList<>();
@@ -112,7 +112,7 @@ public class SQLAccess implements DataAccess {
 						values.add(response.getInt(index));
 						index++;
 						continue;
-					} catch (java.sql.SQLException e) {}
+					} catch (java.sql.SQLException | NumberFormatException e) {}
 					
 					try {
 						values.add(response.getString(key));
@@ -149,8 +149,20 @@ public class SQLAccess implements DataAccess {
 		if (null == data || data.isEmpty()) {
 			return null;
 		}
+		return synthesizeGame(data);
+	}
+
+	private GameData synthesizeGame(List<Object> data) {
 		ChessGame gameObject = (new Gson().newBuilder().enableComplexMapKeySerialization().create()).fromJson((String) data.get(4), ChessGame.class);
-		return new GameData((Integer) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
+		String blackUsername = (String) data.get(2);
+		if ("null".equals(blackUsername)) {
+			blackUsername = null;
+		}
+		String whiteUsername = (String) data.get(1);
+		if ("null".equals(whiteUsername)) {
+			whiteUsername = null;
+		}
+		return new GameData((Integer) data.get(0), whiteUsername, blackUsername, (String) data.get(3), gameObject);
 	}
 
 	public Collection<GameData> getGames() {
@@ -161,17 +173,26 @@ public class SQLAccess implements DataAccess {
 				Collection<GameData> games = new ArrayList<>();
 				try {
 					while (response.next()) {
-						ChessGame gameObject = (new Gson()).fromJson(response.getString("GameObject"), ChessGame.class);
-						GameData data = new GameData(
-								response.getInt(1),
-								response.getString("WhiteUsername"),
-								response.getString("BlackUsername"),
-								response.getString("GameName"),
-								gameObject
-						);
+						GameData data = synthesizeGame(List.of(
+							response.getInt(1),
+							response.getString("WhiteUsername"),
+							response.getString("BlackUsername"),
+							response.getString("GameName"),
+							response.getString("GameObject")
+						));
+						/*
+						 * ChessGame gameObject = (new Gson()).fromJson(response.getString("GameObject"), ChessGame.class);
+						 * GameData data = new GameData(
+								 * response.getInt(1),
+								 * response.getString("WhiteUsername"),
+								 * response.getString("BlackUsername"),
+								 * response.getString("GameName"),
+								 * gameObject
+						 * );
+						 */
 						games.add(data);
 					}
-				} catch (java.sql.SQLException e) {
+				} catch (java.sql.SQLException | NumberFormatException e) {
 					return games;
 				}
 				return games;
@@ -222,5 +243,4 @@ public class SQLAccess implements DataAccess {
 	public void clearGames() {
 		runStatement("DELETE FROM games");
 	}
-
 }

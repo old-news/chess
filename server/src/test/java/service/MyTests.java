@@ -46,8 +46,8 @@ public class MyTests {
 		da.addGame(game);
 		assertNotNull(da.findGame(gameID));
 
-        da.deleteAuth(authToken);
-        assertNull(da.findAuth(authToken));
+        	da.deleteAuth(authToken);
+        	assertNull(da.findAuth(authToken));
 	}
 
 	@Test
