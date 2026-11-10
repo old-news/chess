@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class sqlaccess {
+public class SqlAccessTest {
 	private static DataAccess da;
 	private static List<UserData> users;
 	private static List<String> auths;

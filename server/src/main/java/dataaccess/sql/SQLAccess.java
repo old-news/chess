@@ -28,9 +28,11 @@ import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class SQLAccess implements DataAccess {
+	private static Gson serializer;
 
 	public SQLAccess () {
 		setupDatabase();
+		serializer = new Gson().newBuilder().enableComplexMapKeySerialization().create();
 	}
 
 	private void setupDatabase () {
@@ -69,23 +71,6 @@ public class SQLAccess implements DataAccess {
 		);
 	}
 
-	private boolean runStatements(List<String> statements) {
-		try (var conn = DatabaseManager.getConnection()) {
-			for (String statement : statements) {
-				try (var preparedStatement = conn.prepareStatement(statement)) {
-					if (!preparedStatement.execute()) {
-						return false;
-					}
-					// response.next();
-					// return response;
-				}
-			}
-		} catch (SQLException | DataAccessException e) {
-			return false;
-		}
-		return true;
-	}
-
 	private boolean runStatement(String statement) {
 		try (var conn = DatabaseManager.getConnection()) {
 			try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -111,18 +96,6 @@ public class SQLAccess implements DataAccess {
 			}
 		} catch (SQLException | DataAccessException e) {
 			return false;
-		}
-	}
-
-	private java.sql.ResultSet getQuery(String statement) {
-		try (var conn = DatabaseManager.getConnection()) {
-			try (var preparedStatement = conn.prepareStatement(statement)) {
-				java.sql.ResultSet query = preparedStatement.executeQuery();
-				query.next();
-				return query;
-			}
-		} catch (SQLException | DataAccessException e) {
-			return null;
 		}
 	}
 
@@ -164,7 +137,10 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public UserData findUser(String username) {
-		List<Object> data = runQuery(String.format("SELECT * FROM users WHERE Username = '%s'", username), List.of("Username", "PasswordHash", "Email"));
+		List<Object> data = runQuery(
+				String.format("SELECT * FROM users WHERE Username = '%s'", username),
+				List.of("Username", "PasswordHash", "Email"
+		));
 		if (null == data || data.isEmpty()) {
 			return null;
 		}
@@ -172,7 +148,10 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public AuthData findAuth(String authToken) {
-		List<Object> data = runQuery(String.format("SELECT * FROM auths WHERE AuthToken = '%s'", authToken), List.of("Username", "AuthToken"));
+		List<Object> data = runQuery(
+				String.format("SELECT * FROM auths WHERE AuthToken = '%s'", authToken),
+				List.of("Username", "AuthToken"
+		));
 		if (null == data || data.isEmpty()) {
 			return null;
 		}
@@ -180,7 +159,10 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public GameData findGame(int gameID) {
-		List<Object> data = runQuery(String.format("SELECT * FROM games WHERE GameID = %d", gameID), List.of("GameID", "WhiteUsername", "BlackUsername", "GameName", "GameObject"));
+		List<Object> data = runQuery(
+				String.format("SELECT * FROM games WHERE GameID = %d", gameID),
+				List.of("GameID", "WhiteUsername", "BlackUsername", "GameName", "GameObject"
+		));
 		if (null == data || data.isEmpty()) {
 			return null;
 		}
@@ -188,7 +170,7 @@ public class SQLAccess implements DataAccess {
 	}
 
 	private GameData synthesizeGame(List<Object> data) {
-		ChessGame gameObject = (new Gson().newBuilder().enableComplexMapKeySerialization().create()).fromJson((String) data.get(4), ChessGame.class);
+		ChessGame gameObject = serializer.fromJson((String) data.get(4), ChessGame.class);
 		String blackUsername = (String) data.get(2);
 		/*
 		 * if ("null".equals(blackUsername)) {
@@ -245,12 +227,12 @@ public class SQLAccess implements DataAccess {
 
 	public void addUser(UserData user) {
 		String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-		String statement = String.format("INSERT INTO users VALUES ('%s', '%s', '%s')", user.username(), hashedPassword, user.email());
-		runStatement(statement);
+		// String statement = String.format("INSERT INTO users VALUES ('%s', '%s', '%s')", user.username(), hashedPassword, user.email());
+		runStatement("INSERT INTO users VALUES (?, ?, ?)", List.of(user.username(), hashedPassword, user.email()));
 	}
 
 	public void addAuth(AuthData auth) {
-		runStatement(String.format("INSERT INTO auths VALUES ('%s', '%s')", auth.username(), auth.authToken()));
+		runStatement("INSERT INTO auths VALUES (?, ?)", List.of(auth.username(), auth.authToken()));
 	}
 
 	public void addGame(GameData game) {
@@ -260,11 +242,10 @@ public class SQLAccess implements DataAccess {
 				preparedStatement.setString(2, game.whiteUsername());
 				preparedStatement.setString(3, game.blackUsername());
 				preparedStatement.setString(4, game.gameName());
-				preparedStatement.setString(5, (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()));
+				preparedStatement.setString(5, serializer.toJson(game.game()));
 				preparedStatement.executeUpdate();
 			}
-		} catch (SQLException | DataAccessException e) {
-		}
+		} catch (SQLException | DataAccessException e) {}
 		/*
 		 * runStatement(
 				 * "INSERT INTO games VALUES (?, ?, ?, ?, ?)",
@@ -275,12 +256,16 @@ public class SQLAccess implements DataAccess {
 
 	public void overwriteGame(GameData game) {
 		try (var conn = DatabaseManager.getConnection()) {
-			try (var preparedStatement = conn.prepareStatement("UPDATE games SET GameID = ?, WhiteUsername = ?, BlackUsername = ?, GameName = ?, GameObject = ? WHERE GameID = ?")) {
+			try (
+				var preparedStatement = conn.prepareStatement(
+					"UPDATE games SET GameID = ?, WhiteUsername = ?, BlackUsername = ?, GameName = ?, GameObject = ? WHERE GameID = ?"
+				)
+			) {
 				preparedStatement.setInt(1, game.gameID());
 				preparedStatement.setString(2, game.whiteUsername());
 				preparedStatement.setString(3, game.blackUsername());
 				preparedStatement.setString(4, game.gameName());
-				preparedStatement.setString(5, (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()));
+				preparedStatement.setString(5, serializer.toJson(game.game()));
 				preparedStatement.setInt(6, game.gameID());
 				preparedStatement.executeUpdate();
 			}
@@ -295,7 +280,7 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public void deleteAuth(String authToken) {
-		runStatement(String.format("DELETE FROM auths WHERE AuthToken = '%s'", authToken));
+		runStatement("DELETE FROM auths WHERE AuthToken = ?", List.of(authToken));
 	}
 
 	public void clearUsers() {
