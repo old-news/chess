@@ -45,7 +45,7 @@ public class SQLAccess implements DataAccess {
 		runStatement(
 				"""
 				CREATE TABLE IF NOT EXISTS games (
-					GamdID int,
+					GameID int,
 					WhiteUsername text,
 					BlackUsername text,
 					GameName text,
@@ -86,7 +86,9 @@ public class SQLAccess implements DataAccess {
 	private java.sql.ResultSet getQuery(String statement) {
 		try (var conn = DatabaseManager.getConnection()) {
 			try (var preparedStatement = conn.prepareStatement(statement)) {
-				return preparedStatement.executeQuery();
+				java.sql.ResultSet query = preparedStatement.executeQuery();
+				query.next();
+				return query;
 			}
 		} catch (SQLException | DataAccessException e) {
 			return null;
@@ -94,32 +96,40 @@ public class SQLAccess implements DataAccess {
 	}
 
 	private List<Object> runQuery(String statement, List<String> keys) {
-		var response = getQuery(statement);
+		java.sql.ResultSet response = null;
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement(statement)) {
+				response = preparedStatement.executeQuery();
+				try {
+					response.next();
+				} catch (java.sql.SQLException e) {
+					return new ArrayList<>();
+				}
+				List<Object> values = new ArrayList<>();
+				int index = 1;
+				for (String key : keys) {
+					try {
+						values.add(response.getInt(index));
+						index++;
+						continue;
+					} catch (java.sql.SQLException e) {}
+					
+					try {
+						values.add(response.getString(key));
+					} catch (java.sql.SQLException e) {}
 
-		if (null == response) {
-			return new ArrayList<>();
-		}
-		try {
-			response.next();
-		} catch (java.sql.SQLException e) {
-			return new ArrayList<>();
-		}
-		List<Object> values = new ArrayList<>();
-		for (String key : keys) {
-			try {
-				values.add(response.getString(key));
-			} catch (java.sql.SQLException e) {}
-			
-			try {
-				values.add(response.getInt(1));
-			} catch (java.sql.SQLException e) {}
+				}
+
+				return values;
+			}
+		} catch (SQLException | DataAccessException e) {
+			return null;
 		}
 
-		return values;
 	}
 
 	public UserData findUser(String username) {
-		List<Object> data = runQuery(String.format("SELECT * FROM users WHERE Username = '%s'", username), List.of("Username", "Password", "Email"));
+		List<Object> data = runQuery(String.format("SELECT * FROM users WHERE Username = '%s'", username), List.of("Username", "PasswordHash", "Email"));
 		if (data.isEmpty()) {
 			return null;
 		}
@@ -136,11 +146,11 @@ public class SQLAccess implements DataAccess {
 
 	public GameData findGame(int gameID) {
 		List<Object> data = runQuery(String.format("SELECT * FROM games WHERE GameID = %d", gameID), List.of("GameID", "WhiteUsername", "BlackUsername", "GameName", "GameObject"));
-		if (data.isEmpty()) {
+		if (null == data || data.isEmpty()) {
 			return null;
 		}
 		ChessGame gameObject = (new Gson()).fromJson((String) data.get(4), ChessGame.class);
-		return new GameData((int) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
+		return new GameData(Integer.parseInt((String) data.get(0)), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
 	}
 
 	public Collection<GameData> getGames() {
@@ -166,29 +176,30 @@ public class SQLAccess implements DataAccess {
 
 	public void addUser(UserData user) {
 		String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-		runStatement(String.format("INSERT INTO users VALUES (%s, %s, %s)", user.username(), user.password(), user.email()));
+		String statement = String.format("INSERT INTO users VALUES ('%s', '%s', '%s')", user.username(), hashedPassword, user.email());
+		runStatement(statement);
 	}
 
 	public void addAuth(AuthData auth) {
-		runStatement(String.format("INSERT INTO auths VALUES (%s, %s)", auth.username(), auth.authToken()));
+		runStatement(String.format("INSERT INTO auths VALUES ('%s', '%s')", auth.username(), auth.authToken()));
 	}
 
 	public void addGame(GameData game) {
 		runStatement(String.format(
-				"INSERT INTO games VALUES (%d, %s, %s, %s, %s)",
+				"INSERT INTO games VALUES (%d, '%s', '%s', '%s', '%s')",
 				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()
 		));
 	}
 
 	public void overwriteGame(GameData game) {
 		runStatement(String.format(
-				"UPDATE games SET GameID = %d, WhiteUsername = %s, BlackUsername = %s, GameName = %s, GameObject = %s WHERE GameID = %d",
+				"UPDATE games SET GameID = %d, WhiteUsername = '%s', BlackUsername = '%s', GameName = '%s', GameObject = '%s' WHERE GameID = %d",
 				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameID()
 		));
 	}
 
 	public void deleteAuth(String authToken) {
-		runStatement(String.format("DELETE FROM auths WHERE AuthToken = %s", authToken));
+		runStatement(String.format("DELETE FROM auths WHERE AuthToken = '%s'", authToken));
 	}
 
 	public void clearUsers() {
