@@ -3,7 +3,9 @@ package server;
 import dataaccess.*;
 import dataaccess.sql.*;
 import service.*;
+
 import com.google.gson.Gson;
+import io.javalin.http.InternalServerErrorResponse;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -30,6 +32,10 @@ public class Handler {
 		return new HandlerResult(status, body);
 	}
 
+	private HandlerResult internalError() {
+		return new HandlerResult(500, Map.of("message", "Internal Server Error"));
+	}
+
 	public HandlerResult registerUser(String requestBody) {
 		int status = 200;
 		Map<String, Object> body;
@@ -48,6 +54,8 @@ public class Handler {
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 403;
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -70,6 +78,8 @@ public class Handler {
 			} else if (e.getMessage().equals("invalid credentials")) {
 				status = 401;
 			}
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -87,6 +97,8 @@ public class Handler {
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -104,6 +116,8 @@ public class Handler {
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -122,6 +136,8 @@ public class Handler {
 		} catch (DataAccessException e) {
 			body = Map.of("message", "Error: " + e.getMessage());
 			status = 401;
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -149,6 +165,8 @@ public class Handler {
 				case "color already taken" -> status = 403;
 				case "invalid join color" -> status = 400;
 			}
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
 		}
 		return new HandlerResult(status, body);
 	}
@@ -156,9 +174,12 @@ public class Handler {
 	public HandlerResult clearDB() {
 		int status = 200;
 		Map<String, Object> body;
-//		try {
+		try {
 			ClearDBResult res = cs.clearDB();
 			body = Map.of("succeeded", java.lang.Boolean.toString(res.success()));
+		} catch (InternalServerErrorResponse e) {
+			return internalError();
+		}
 //		} catch (DataAccessException e) {
 //			bodyItem = Map.of("message", "Error: " + e.getMessage());
 //			status = 400;

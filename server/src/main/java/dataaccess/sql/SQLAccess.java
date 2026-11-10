@@ -1,6 +1,7 @@
 package dataaccess.sql;
 
 import dataaccess.*;
+import io.javalin.http.InternalServerErrorResponse;
 import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 import service.*;
@@ -77,7 +78,8 @@ public class SQLAccess implements DataAccess {
 				return preparedStatement.execute();
 			}
 		} catch (SQLException | DataAccessException e) {
-			return false;
+			throw new InternalServerErrorResponse(e.getMessage());
+			// return false;
 		}
 	}
 
@@ -95,7 +97,8 @@ public class SQLAccess implements DataAccess {
 				return preparedStatement.execute();
 			}
 		} catch (SQLException | DataAccessException e) {
-			return false;
+			throw new InternalServerErrorResponse(e.getMessage());
+			// return false;
 		}
 	}
 
@@ -131,7 +134,8 @@ public class SQLAccess implements DataAccess {
 				return values;
 			}
 		} catch (SQLException | DataAccessException e) {
-			return null;
+			throw new InternalServerErrorResponse(e.getMessage());
+			// return null;
 		}
 
 	}
@@ -219,7 +223,8 @@ public class SQLAccess implements DataAccess {
 				return games;
 			}
 		} catch (SQLException | DataAccessException e) {
-			return null;
+			throw new InternalServerErrorResponse(e.getMessage());
+			// return null;
 		}
 
 
@@ -245,7 +250,9 @@ public class SQLAccess implements DataAccess {
 				preparedStatement.setString(5, serializer.toJson(game.game()));
 				preparedStatement.executeUpdate();
 			}
-		} catch (SQLException | DataAccessException e) {}
+		} catch (SQLException | DataAccessException e) {
+			throw new InternalServerErrorResponse(e.getMessage());
+		}
 		/*
 		 * runStatement(
 				 * "INSERT INTO games VALUES (?, ?, ?, ?, ?)",
@@ -270,6 +277,7 @@ public class SQLAccess implements DataAccess {
 				preparedStatement.executeUpdate();
 			}
 		} catch (SQLException | DataAccessException e) {
+			throw new InternalServerErrorResponse(e.getMessage());
 		}
 		/*
 		 * runStatement(String.format(
