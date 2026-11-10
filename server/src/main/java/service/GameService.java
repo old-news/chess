@@ -3,6 +3,7 @@ package service;
 import java.util.Collection;
 import java.util.Random;
 
+import com.google.gson.Gson;
 import dataaccess.*;
 import chess.ChessGame;
 
@@ -61,9 +62,9 @@ public class GameService {
 		}
 		playerColor = playerColor.toLowerCase();
 		if (playerColor.equals("white")) {
-			return null != game.whiteUsername();
+			return null != game.whiteUsername() && !"null".equals(game.whiteUsername());
 		} else if (playerColor.equals("black")) {
-			return null != game.blackUsername();
+			return null != game.blackUsername() && !"null".equals(game.blackUsername());
 		}
 		return false;
 	}

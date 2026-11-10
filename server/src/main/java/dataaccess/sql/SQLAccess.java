@@ -149,8 +149,8 @@ public class SQLAccess implements DataAccess {
 		if (null == data || data.isEmpty()) {
 			return null;
 		}
-		ChessGame gameObject = (new Gson()).fromJson((String) data.get(4), ChessGame.class);
-		return new GameData(Integer.parseInt((String) data.get(0)), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
+		ChessGame gameObject = (new Gson().newBuilder().enableComplexMapKeySerialization().create()).fromJson((String) data.get(4), ChessGame.class);
+		return new GameData((Integer) data.get(0), (String) data.get(1), (String) data.get(2), (String) data.get(3), gameObject);
 	}
 
 	public Collection<GameData> getGames() {
@@ -187,14 +187,14 @@ public class SQLAccess implements DataAccess {
 	public void addGame(GameData game) {
 		runStatement(String.format(
 				"INSERT INTO games VALUES (%d, '%s', '%s', '%s', '%s')",
-				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game()
+				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game())
 		));
 	}
 
 	public void overwriteGame(GameData game) {
 		runStatement(String.format(
 				"UPDATE games SET GameID = %d, WhiteUsername = '%s', BlackUsername = '%s', GameName = '%s', GameObject = '%s' WHERE GameID = %d",
-				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameID()
+				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()), game.gameID()
 		));
 	}
 
