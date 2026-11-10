@@ -130,7 +130,7 @@ public class SQLAccess implements DataAccess {
 
 	public UserData findUser(String username) {
 		List<Object> data = runQuery(String.format("SELECT * FROM users WHERE Username = '%s'", username), List.of("Username", "PasswordHash", "Email"));
-		if (data.isEmpty()) {
+		if (null == data || data.isEmpty()) {
 			return null;
 		}
 		return new UserData((String) data.get(0), (String) data.get(1), (String) data.get(2));
@@ -138,7 +138,7 @@ public class SQLAccess implements DataAccess {
 
 	public AuthData findAuth(String authToken) {
 		List<Object> data = runQuery(String.format("SELECT * FROM auths WHERE AuthToken = '%s'", authToken), List.of("Username", "AuthToken"));
-		if (data.isEmpty()) {
+		if (null == data || data.isEmpty()) {
 			return null;
 		}
 		return new AuthData((String) data.get(0), (String) data.get(1));
@@ -154,24 +154,33 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public Collection<GameData> getGames() {
-		var response = getQuery("SELECT * FROM games");
-		Collection<GameData> games = new ArrayList<>();
-		try {
-			while (response.next()) {
-				ChessGame gameObject = (new Gson()).fromJson(response.getString("GameObject"), ChessGame.class);
-				GameData data = new GameData(
-						response.getInt(1),
-						response.getString("WhiteUsername"),
-						response.getString("BlackUsername"),
-						response.getString("GameName"),
-						gameObject
-				);
-				games.add(data);
+		String statement = "SELECT * FROM games";
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement(statement)) {
+				java.sql.ResultSet response = preparedStatement.executeQuery();
+				Collection<GameData> games = new ArrayList<>();
+				try {
+					while (response.next()) {
+						ChessGame gameObject = (new Gson()).fromJson(response.getString("GameObject"), ChessGame.class);
+						GameData data = new GameData(
+								response.getInt(1),
+								response.getString("WhiteUsername"),
+								response.getString("BlackUsername"),
+								response.getString("GameName"),
+								gameObject
+						);
+						games.add(data);
+					}
+				} catch (java.sql.SQLException e) {
+					return games;
+				}
+				return games;
 			}
-		} catch (java.sql.SQLException e) {
-			return games;
+		} catch (SQLException | DataAccessException e) {
+			return null;
 		}
-		return games;
+
+
 	}
 
 	public void addUser(UserData user) {
