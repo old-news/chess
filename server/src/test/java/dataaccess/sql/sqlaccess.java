@@ -82,16 +82,23 @@ public class sqlaccess {
 	@Order(4)
 	public void gameStuffWorks() {
 		ChessGame gameObject = new ChessGame();
-		GameData game = new GameData(1, "null", "null", "cucumbers", gameObject);
+		GameData game = new GameData(1, null, null, "cucumbers", gameObject);
 		da.addGame(game);
 		game = new GameData(1, "bob", "joe", "cucumbers", gameObject);
 		da.overwriteGame(game);
+
+		gameObject = new ChessGame();
+		gameObject.setTeamTurn(ChessGame.TeamColor.BLACK);
+		GameData game2 = new GameData(3, "bob", "bob", "cucumbers", gameObject);
+		da.addGame(game2);
+
 		GameData found = da.findGame(1);
 		assertEquals(found, game);
 		Collection<GameData> games = da.getGames();
 		assertNotNull(games);
-		assertEquals(games.size(), 1);
-		assertEquals(((ArrayList<GameData>) games).getFirst(), game);
+		assertEquals(games.size(), 2);
+		assertEquals(((ArrayList<GameData>) games).get(0), game);
+		assertEquals(((ArrayList<GameData>) games).get(1), game2);
 	}
 
 	@Test

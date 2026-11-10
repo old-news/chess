@@ -10,6 +10,20 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import com.google.gson.Gson;
+import org.mindrot.jbcrypt.BCrypt;
+
+import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
+import server.*;
+import service.*;
+import chess.ChessGame;
+
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+import java.util.ArrayList;
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -67,7 +81,6 @@ public class SQLAccess implements DataAccess {
 				}
 			}
 		} catch (SQLException | DataAccessException e) {
-			System.out.println(e.getMessage());
 			return false;
 		}
 		return true;
@@ -76,6 +89,24 @@ public class SQLAccess implements DataAccess {
 	private boolean runStatement(String statement) {
 		try (var conn = DatabaseManager.getConnection()) {
 			try (var preparedStatement = conn.prepareStatement(statement)) {
+				return preparedStatement.execute();
+			}
+		} catch (SQLException | DataAccessException e) {
+			return false;
+		}
+	}
+
+	private boolean runStatement(String statement, List<Object> items) {
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement(statement)) {
+				for (int i = 0; i < items.size(); i++) {
+					var item = items.get(i);
+					if (item.getClass() == Integer.class) {
+						preparedStatement.setInt(i + 1, (int) item);
+					} else {
+						preparedStatement.setString(i + 1, (String) item);
+					}
+				}
 				return preparedStatement.execute();
 			}
 		} catch (SQLException | DataAccessException e) {
@@ -109,7 +140,11 @@ public class SQLAccess implements DataAccess {
 				int index = 1;
 				for (String key : keys) {
 					try {
-						values.add(response.getInt(index));
+						Integer val = response.getInt(index);
+						if (response.wasNull()) {
+							val = null;
+						}
+						values.add(val);
 						index++;
 						continue;
 					} catch (java.sql.SQLException | NumberFormatException e) {}
@@ -155,13 +190,17 @@ public class SQLAccess implements DataAccess {
 	private GameData synthesizeGame(List<Object> data) {
 		ChessGame gameObject = (new Gson().newBuilder().enableComplexMapKeySerialization().create()).fromJson((String) data.get(4), ChessGame.class);
 		String blackUsername = (String) data.get(2);
-		if ("null".equals(blackUsername)) {
-			blackUsername = null;
-		}
+		/*
+		 * if ("null".equals(blackUsername)) {
+			 * blackUsername = null;
+		 * }
+		 */
 		String whiteUsername = (String) data.get(1);
-		if ("null".equals(whiteUsername)) {
-			whiteUsername = null;
-		}
+		/*
+		 * if ("null".equals(whiteUsername)) {
+			 * whiteUsername = null;
+		 * }
+		 */
 		return new GameData((Integer) data.get(0), whiteUsername, blackUsername, (String) data.get(3), gameObject);
 	}
 
@@ -173,7 +212,7 @@ public class SQLAccess implements DataAccess {
 				Collection<GameData> games = new ArrayList<>();
 				try {
 					while (response.next()) {
-						GameData data = synthesizeGame(List.of(
+						GameData data = synthesizeGame(Arrays.asList(
 							response.getInt(1),
 							response.getString("WhiteUsername"),
 							response.getString("BlackUsername"),
@@ -215,17 +254,44 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public void addGame(GameData game) {
-		runStatement(String.format(
-				"INSERT INTO games VALUES (%d, '%s', '%s', '%s', '%s')",
-				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game())
-		));
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement("INSERT INTO games VALUES (?, ?, ?, ?, ?)")) {
+				preparedStatement.setInt(1, game.gameID());
+				preparedStatement.setString(2, game.whiteUsername());
+				preparedStatement.setString(3, game.blackUsername());
+				preparedStatement.setString(4, game.gameName());
+				preparedStatement.setString(5, (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()));
+				preparedStatement.executeUpdate();
+			}
+		} catch (SQLException | DataAccessException e) {
+		}
+		/*
+		 * runStatement(
+				 * "INSERT INTO games VALUES (?, ?, ?, ?, ?)",
+				 * List.of(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game())
+		 * ));
+		 */
 	}
 
 	public void overwriteGame(GameData game) {
-		runStatement(String.format(
-				"UPDATE games SET GameID = %d, WhiteUsername = '%s', BlackUsername = '%s', GameName = '%s', GameObject = '%s' WHERE GameID = %d",
-				game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()), game.gameID()
-		));
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement("UPDATE games SET GameID = ?, WhiteUsername = ?, BlackUsername = ?, GameName = ?, GameObject = ? WHERE GameID = ?")) {
+				preparedStatement.setInt(1, game.gameID());
+				preparedStatement.setString(2, game.whiteUsername());
+				preparedStatement.setString(3, game.blackUsername());
+				preparedStatement.setString(4, game.gameName());
+				preparedStatement.setString(5, (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()));
+				preparedStatement.setInt(6, game.gameID());
+				preparedStatement.executeUpdate();
+			}
+		} catch (SQLException | DataAccessException e) {
+		}
+		/*
+		 * runStatement(String.format(
+				 * "UPDATE games SET GameID = %d, WhiteUsername = '%s', BlackUsername = '%s', GameName = '%s', GameObject = '%s' WHERE GameID = %d",
+				 * game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()), game.gameID()
+		 * ));
+		 */
 	}
 
 	public void deleteAuth(String authToken) {
