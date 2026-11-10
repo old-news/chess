@@ -22,21 +22,27 @@ public class SQLAccess implements DataAccess {
 	private void setupDatabase () {
 		try {
 			DatabaseManager.createDatabase();
-		} catch (DataAccessException e) {}
-		runStatements(List.of(
+		} catch (DataAccessException e) {
+			System.out.println("ERR: database creation failed");
+		}
+		runStatement(
 				"""
 				CREATE TABLE IF NOT EXISTS users (
 					Username text,
 					PasswordHash text,
 					Email text
 				);
-				""",
+				"""
+		);
+		runStatement(
 				"""
 				CREATE TABLE IF NOT EXISTS auths (
 					Username text,
 					AuthToken text
 				);
-				""",
+				"""
+		);
+		runStatement(
 				"""
 				CREATE TABLE IF NOT EXISTS games (
 					GamdID int,
@@ -46,46 +52,59 @@ public class SQLAccess implements DataAccess {
 					GameObject text
 				)
 				"""
-		));
+		);
 	}
 
-	private void runStatements(List<String> statements) {
+	private boolean runStatements(List<String> statements) {
 		try (var conn = DatabaseManager.getConnection()) {
 			for (String statement : statements) {
 				try (var preparedStatement = conn.prepareStatement(statement)) {
-					var response = preparedStatement.executeQuery();
+					if (!preparedStatement.execute()) {
+						return false;
+					}
 					// response.next();
 					// return response;
-				} catch (java.sql.SQLException e) {return;}
+				}
 			}
 		} catch (SQLException | DataAccessException e) {
-			return;
+			System.out.println(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	private boolean runStatement(String statement) {
+		try (var conn = DatabaseManager.getConnection()) {
+			try (var preparedStatement = conn.prepareStatement(statement)) {
+				return preparedStatement.execute();
+			}
+		} catch (SQLException | DataAccessException e) {
+			return false;
 		}
 	}
 
-	private java.sql.ResultSet runStatement(String statement) {
+	private java.sql.ResultSet getQuery(String statement) {
 		try (var conn = DatabaseManager.getConnection()) {
 			try (var preparedStatement = conn.prepareStatement(statement)) {
-				var response = preparedStatement.executeQuery();
-				response.next();
-				return response;
-			} catch (java.sql.SQLException e) {return null;}
+				return preparedStatement.executeQuery();
+			}
 		} catch (SQLException | DataAccessException e) {
 			return null;
 		}
 	}
 
 	private List<Object> runQuery(String statement, List<String> keys) {
-		var response = runStatement(statement);
+		var response = getQuery(statement);
+
 		if (null == response) {
 			return new ArrayList<>();
 		}
 		try {
 			response.next();
 		} catch (java.sql.SQLException e) {
-			return null;
+			return new ArrayList<>();
 		}
-		List<Object> values = new ArrayList<Object>();
+		List<Object> values = new ArrayList<>();
 		for (String key : keys) {
 			try {
 				values.add(response.getString(key));
@@ -125,7 +144,7 @@ public class SQLAccess implements DataAccess {
 	}
 
 	public Collection<GameData> getGames() {
-		var response = runStatement("SELECT * FROM games");
+		var response = getQuery("SELECT * FROM games");
 		Collection<GameData> games = new ArrayList<>();
 		try {
 			while (response.next()) {
