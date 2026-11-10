@@ -117,9 +117,7 @@ public class SQLAccess implements DataAccess {
 				for (String key : keys) {
 					try {
 						Integer val = response.getInt(index);
-						if (response.wasNull()) {
-							val = null;
-						}
+						val = (response.wasNull()) ? null : val;
 						values.add(val);
 						index++;
 						continue;
@@ -253,19 +251,13 @@ public class SQLAccess implements DataAccess {
 		} catch (SQLException | DataAccessException e) {
 			throw new InternalServerErrorResponse(e.getMessage());
 		}
-		/*
-		 * runStatement(
-				 * "INSERT INTO games VALUES (?, ?, ?, ?, ?)",
-				 * List.of(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game())
-		 * ));
-		 */
 	}
 
 	public void overwriteGame(GameData game) {
 		try (var conn = DatabaseManager.getConnection()) {
 			try (
 				var preparedStatement = conn.prepareStatement(
-					"UPDATE games SET GameID = ?, WhiteUsername = ?, BlackUsername = ?, GameName = ?, GameObject = ? WHERE GameID = ?"
+				"UPDATE games SET GameID = ?, WhiteUsername = ?, BlackUsername = ?, GameName = ?, GameObject = ? WHERE GameID = ?"
 				)
 			) {
 				preparedStatement.setInt(1, game.gameID());
@@ -279,12 +271,6 @@ public class SQLAccess implements DataAccess {
 		} catch (SQLException | DataAccessException e) {
 			throw new InternalServerErrorResponse(e.getMessage());
 		}
-		/*
-		 * runStatement(String.format(
-				 * "UPDATE games SET GameID = %d, WhiteUsername = '%s', BlackUsername = '%s', GameName = '%s', GameObject = '%s' WHERE GameID = %d",
-				 * game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), (new Gson().newBuilder().enableComplexMapKeySerialization().create()).toJson(game.game()), game.gameID()
-		 * ));
-		 */
 	}
 
 	public void deleteAuth(String authToken) {

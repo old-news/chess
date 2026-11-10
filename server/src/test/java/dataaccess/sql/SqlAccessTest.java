@@ -48,11 +48,13 @@ public class SqlAccessTest {
 		UserData found = da.findUser(john.username());
 		assertEquals(john.username(), found.username());
 		assertEquals(john.email(), found.email());
+		assertTrue(DataAccess.validatePassword(john.password(), found.password()));
 		UserData bob = new UserData("bob", "fih4aWGNbqeoigaa12ea", "b0b@hotmail.com");
 		da.addUser(bob);
 		found = da.findUser(bob.username());
 		assertEquals(bob.username(), found.username());
 		assertEquals(bob.email(), found.email());
+		assertTrue(DataAccess.validatePassword(bob.password(), found.password()));
 		users.add(john);
 		users.add(bob);
 	}
