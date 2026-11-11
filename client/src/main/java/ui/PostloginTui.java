@@ -165,10 +165,16 @@ public class PostloginTui {
 	}
 
 	public void showGames(List<GameData> games) {
+		String nobody = EscapeSequences.SET_TEXT_COLOR_RED + "Nobody" + EscapeSequences.RESET_TEXT_COLOR;
 		for (int i = 0; i < games.size(); i++) {
+			GameData game = games.get(i);
+			String white = EscapeSequences.SET_TEXT_COLOR_BLUE + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			String black = EscapeSequences.SET_TEXT_COLOR_BLUE + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
 			System.out.println(
 				"\t" + (i+1) + ": " +
-				EscapeSequences.SET_TEXT_COLOR_MAGENTA + games.get(i).gameName() + EscapeSequences.RESET_TEXT_COLOR
+				EscapeSequences.SET_TEXT_COLOR_MAGENTA + game.gameName() + EscapeSequences.RESET_TEXT_COLOR + " with " +
+				((null == game.whiteUsername()) ? nobody : white) + " VS " +
+				((null == game.blackUsername()) ? nobody : black)
 			);
 		}
 	}

@@ -71,7 +71,7 @@ public class ServerFacade {
 			if (null == games) {
 				listGames(data.get(0));
 			}
-			int gameID = games.get(Integer.parseInt(data.get(2))).gameID();
+			int gameID = games.get(Integer.parseInt(data.get(2)) - 1).gameID();
 			JoinGameRequest req = new JoinGameRequest(data.get(0), data.get(1), gameID);
 			System.out.println(req);
 			JoinGameResult res = gs.joinGame(req);

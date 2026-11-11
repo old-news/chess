@@ -12,10 +12,11 @@ public class ClientMain {
 		ServerFacade sf = new ServerFacade();
 		GameData game = null;
 
-		do {
+		while (true) {
 			AuthData auth = prelogin(sf);
 			game = postlogin(auth, sf);
-		} while (null == game);
+			if (null == game) continue;
+		}
 	}
 
 	private static AuthData prelogin(ServerFacade sf) {
