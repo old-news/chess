@@ -14,7 +14,6 @@ public class PreloginTui {
 		username = EscapeSequences.SET_TEXT_COLOR_RED + "LOGGED_OUT" + EscapeSequences.RESET_TEXT_COLOR;
 		lastUserResponse = null;
 		lastCommand = null;
-		System.out.println("Chess client - type 'help' for options");
 	}
 
 	public void step() {
@@ -45,19 +44,19 @@ public class PreloginTui {
 	}
 
 	private static void commandHelp() {
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "register" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create an account"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "login" + EscapeSequences.RESET_TEXT_COLOR +
 			" - login to an existing account"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
 			" - display this message"
 		);
@@ -74,8 +73,14 @@ public class PreloginTui {
 	}
 
 	private void commandRegister() {
-		System.out.print("\tUsername: ");
-		String username = input.nextLine();
+		String username = null;
+		do {
+			if (null != username) {
+				System.out.println("You must submit a username that's at least 1 character long");
+			}
+			System.out.print("\tUsername: ");
+			username = input.nextLine();
+		} while (username.isEmpty());
 		System.out.print("\tPassword: ");
 		String password = input.nextLine();
 		System.out.print("\tEmail: ");
@@ -113,7 +118,15 @@ public class PreloginTui {
 			username = EscapeSequences.SET_TEXT_COLOR_BLUE + lastUserResponse.getFirst() + EscapeSequences.RESET_TEXT_COLOR;
 			System.out.println("You're registered and logged in " + username + "!");
 		} else {
-			System.out.println("Registration failed");
+			System.out.println("Registration failed - try a different username");
 		}
+	}
+
+	public void internalError() {
+		System.out.println("Previous command failed due to server error");
+	}
+
+	public static void greet() {
+		System.out.println("Chess client - type 'help' for options");
 	}
 }

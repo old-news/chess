@@ -57,31 +57,31 @@ public class PostloginTui {
 	}
 
 	private static void commandHelp() {
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "create" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create a game"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "list" + EscapeSequences.RESET_TEXT_COLOR +
 			" - list all games"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "join" + EscapeSequences.RESET_TEXT_COLOR +
 			" - join a game"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "observe" + EscapeSequences.RESET_TEXT_COLOR +
 			" - observe a game"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "logout" + EscapeSequences.RESET_TEXT_COLOR +
 			" - logout of the server"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
-		System.out.println("\t\t" +
+		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
 			" - display this message"
 		);
@@ -136,7 +136,7 @@ public class PostloginTui {
 		return;
 	}
 	private static void commandQuit() {
-		System.exit(0);
+		return;
 	}
 
 	private static void commandDoesNotExist(String command) {
@@ -181,7 +181,7 @@ public class PostloginTui {
 
 	public void joinGameSuccess(boolean succeeded) {
 		if (!succeeded) {
-			System.out.println("Failed to join game");
+			System.out.println("Failed to join game - enter a valid game number");
 		} else {
 			System.out.println("Joined game successfully!");
 		}
@@ -201,5 +201,9 @@ public class PostloginTui {
 		} else {
 			System.out.println("Successfully logged out");
 		}
+	}
+
+	public void internalError() {
+		System.out.println("Previous command failed due to server error");
 	}
 }

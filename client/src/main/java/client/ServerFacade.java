@@ -71,13 +71,19 @@ public class ServerFacade {
 			if (null == games) {
 				listGames(data.get(0));
 			}
-			int gameID = games.get(Integer.parseInt(data.get(2)) - 1).gameID();
+			int gameID = 0;
+			while (0 == gameID) {
+				try {
+					gameID = games.get(Integer.parseInt(data.get(2)) - 1).gameID();
+				} catch (IndexOutOfBoundsException e) {
+					return null;
+				}
+			}
 			JoinGameRequest req = new JoinGameRequest(data.get(0), data.get(1), gameID);
 			System.out.println(req);
 			JoinGameResult res = gs.joinGame(req);
 			return res.game();
 		} catch (DataAccessException e) {
-			System.out.println(e.getMessage());
 			return null;
 		}
 	}
