@@ -86,19 +86,43 @@ public class PostloginTui {
 	}
 
 	private void commandCreate() {
-		System.exit(0);
+		System.out.print("\tGame Name: ");
+		String name = input.nextLine();
+		lastUserResponse = List.of(name);
 	}
 
 	private void commandList() {
-		System.exit(0);
+		return;
 	}
 
 	private void commandJoin() {
-		System.exit(0);
+		String number = getGameNumber();
+		String color = null;
+		do {
+			if (null != color) {
+				System.out.println("You must submit 'w' (white) or 'b' (black) as your color");
+			}
+			System.out.print("\tColor (w/b): ");
+			color = input.nextLine();
+		} while (!color.matches("[wWbB]"));
+		lastUserResponse = List.of(number, color);
+	}
+
+	private String getGameNumber() {
+		String number = null;
+		do {
+			if (null != number) {
+				System.out.println("You must submit a numeric Game #");
+			}
+			System.out.print("\tGame #: ");
+			number = input.nextLine();
+		} while (!number.matches("\\d+"));
+		return number;
 	}
 
 	private void commandObserve() {
-		System.exit(0);
+		String number = getGameNumber();
+		lastUserResponse = List.of(number);
 	}
 
 	private void commandLogout() {
