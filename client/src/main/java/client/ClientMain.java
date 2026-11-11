@@ -2,20 +2,40 @@ package client;
 
 import chess.*;
 import ui.*;
+import service.*;
+import server.*;
 
 public class ClientMain {
 	public static void main(String[] args) {
-		Tui tui = new Tui();
+		String authToken = null;
+		ServerFacade sf = new ServerFacade();
+
+		AuthData auth = prelogin(sf);
+	}
+
+	private static AuthData prelogin(ServerFacade sf) {
+		PreloginTui pretui = new PreloginTui();
+
 		while (true) {
-			tui.step();
-			switch (tui.getLastCommand()) {
+			pretui.step();
+			switch (pretui.getLastCommand()) {
 				case "login" -> {
-					System.out.println("logging in with: " + tui.getLastUserResponse());
-					// server.login(tui.getLastUserResponse());
+					AuthData res = sf.login(pretui.getLastUserResponse());
+					if (null == res) {
+						pretui.loginSuccess(false);
+					} else {
+						pretui.loginSuccess(true);
+						return res;
+					}
 				}
 				case "register" -> {
-					System.out.println("registering with: " + tui.getLastUserResponse());
-					// server.registerUser(tui.getLastUserResponse());
+					AuthData res = sf.registerUser(pretui.getLastUserResponse());
+					if (null == res) {
+						pretui.registerSuccess(false);
+					} else {
+						pretui.registerSuccess(true);
+						return res;
+					}
 				}
 			}
 		}

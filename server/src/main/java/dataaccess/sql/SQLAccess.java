@@ -1,8 +1,6 @@
 package dataaccess.sql;
 
 import dataaccess.*;
-import io.javalin.http.InternalServerErrorResponse;
-import org.mindrot.jbcrypt.BCrypt;
 import server.*;
 import service.*;
 import chess.ChessGame;
@@ -12,19 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import com.google.gson.Gson;
-import org.mindrot.jbcrypt.BCrypt;
-
-import dataaccess.*;
-import org.mindrot.jbcrypt.BCrypt;
-import server.*;
-import service.*;
-import chess.ChessGame;
-
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
+import io.javalin.http.InternalServerErrorResponse;
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -38,7 +24,6 @@ public class SQLAccess implements DataAccess {
 
 	private void setupDatabase () {
 		try {
-			setupDatabase();
 			DatabaseManager.createDatabase();
 		} catch (DataAccessException e) {
 			System.out.println("ERR: database creation failed");

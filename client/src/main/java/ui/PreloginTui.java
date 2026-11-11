@@ -3,13 +3,13 @@ package ui;
 import java.util.Scanner;
 import java.util.List;
 
-public class Tui {
+public class PreloginTui {
 	private static Scanner input;
 	private static String username;
 	private List<String> lastUserResponse;
 	private String lastCommand;
 
-	public Tui () {
+	public PreloginTui () {
 		input = new Scanner(System.in);
 		username = EscapeSequences.SET_TEXT_COLOR_RED + "LOGGED_OUT" + EscapeSequences.RESET_TEXT_COLOR;
 		lastUserResponse = null;
@@ -45,19 +45,19 @@ public class Tui {
 	}
 
 	private static void commandHelp() {
-		System.out.println("\t" +
+		System.out.println("\t\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "register" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create an account"
 		);
-		System.out.println("\t" +
+		System.out.println("\t\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "login" + EscapeSequences.RESET_TEXT_COLOR +
 			" - login to an existing account"
 		);
-		System.out.println("\t" +
+		System.out.println("\t\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "exit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
-		System.out.println("\t" +
+		System.out.println("\t\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
 			" - display this message"
 		);
@@ -97,5 +97,23 @@ public class Tui {
 
 	public List<String> getLastUserResponse() {
 		return lastUserResponse;
+	}
+
+	public void loginSuccess(boolean successful) {
+		if (successful) {
+			username = EscapeSequences.SET_TEXT_COLOR_BLUE + lastUserResponse.getFirst() + EscapeSequences.RESET_TEXT_COLOR;
+			System.out.println("You're all logged in " + username + "!");
+		} else {
+			System.out.println("Login failed");
+		}
+	}
+
+	public void registerSuccess(boolean successful) {
+		if (successful) {
+			username = EscapeSequences.SET_TEXT_COLOR_BLUE + lastUserResponse.getFirst() + EscapeSequences.RESET_TEXT_COLOR;
+			System.out.println("You're registered and logged in " + username + "!");
+		} else {
+			System.out.println("Registration failed");
+		}
 	}
 }
