@@ -11,6 +11,7 @@ public class ClientMain {
 		ServerFacade sf = new ServerFacade();
 
 		AuthData auth = prelogin(sf);
+		GameData game = postlogin(auth, sf);
 	}
 
 	private static AuthData prelogin(ServerFacade sf) {
@@ -36,6 +37,26 @@ public class ClientMain {
 						pretui.registerSuccess(true);
 						return res;
 					}
+				}
+			}
+		}
+	}
+
+	private static GameData postlogin(AuthData auth, ServerFacade sf) {
+		PostloginTui tui = new PostloginTui(auth.username());
+
+		while (true) {
+			tui.step();
+			switch (tui.getLastCommand()) {
+				case "join" -> {
+				}
+
+				case "create" -> {
+				}
+
+				case "observe" -> {
+				}
+				case "logout" -> {
 				}
 			}
 		}

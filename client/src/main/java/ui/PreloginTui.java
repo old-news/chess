@@ -54,7 +54,7 @@ public class PreloginTui {
 			" - login to an existing account"
 		);
 		System.out.println("\t\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "exit" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
 		System.out.println("\t\t" +
