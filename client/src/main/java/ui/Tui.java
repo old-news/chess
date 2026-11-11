@@ -1,24 +1,29 @@
 package ui;
 
 import java.util.Scanner;
+import java.util.List;
 
 public class Tui {
 	private static Scanner input;
 	private static String username;
+	private List<String> lastUserResponse;
+	private String lastCommand;
 
 	public Tui () {
 		input = new Scanner(System.in);
 		username = EscapeSequences.SET_TEXT_COLOR_RED + "LOGGED_OUT" + EscapeSequences.RESET_TEXT_COLOR;
+		lastUserResponse = null;
+		lastCommand = null;
 		System.out.println("Chess client - type 'help' for options");
 	}
 
-	public static void step() {
+	public void step() {
 		System.out.print(username + " >> ");
 		String command = input.nextLine();
 		runCommand(command);
 	}
 
-	private static String runCommand(String command) {
+	private void runCommand(String command) {
 		switch (command.toLowerCase()) {
 			case "help" -> {
 				commandHelp();
@@ -27,16 +32,16 @@ public class Tui {
 				commandQuit();
 			}
 			case "register" -> {
-				return commandRegister();
+				commandRegister();
 			}
 			case "login" -> {
-				return commandLogin();
+				commandLogin();
 			}
 			default -> {
 				commandDoesNotExist(command);
 			}
 		}
-		return null;
+		lastCommand = command.toLowerCase();
 	}
 
 	private static void commandHelp() {
@@ -68,21 +73,29 @@ public class Tui {
 		commandHelp();
 	}
 
-	private static String commandRegister() {
+	private void commandRegister() {
 		System.out.print("\tUsername: ");
 		String username = input.nextLine();
 		System.out.print("\tPassword: ");
 		String password = input.nextLine();
 		System.out.print("\tEmail: ");
 		String email = input.nextLine();
-		return String.format("{username=%s, password=%s, email=%s}", username, password, email);
+		lastUserResponse = List.of(username, password, email);
 	}
 
-	private static String commandLogin() {
+	private void commandLogin() {
 		System.out.print("\tUsername: ");
 		String username = input.nextLine();
 		System.out.print("\tPassword: ");
 		String password = input.nextLine();
-		return String.format("{username=%s, password=%s}", username, password);
+		lastUserResponse = List.of(username, password);
+	}
+
+	public String getLastCommand() {
+		return lastCommand;
+	}
+
+	public List<String> getLastUserResponse() {
+		return lastUserResponse;
 	}
 }
