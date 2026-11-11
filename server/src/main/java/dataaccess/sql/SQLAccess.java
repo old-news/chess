@@ -38,6 +38,7 @@ public class SQLAccess implements DataAccess {
 
 	private void setupDatabase () {
 		try {
+			setupDatabase();
 			DatabaseManager.createDatabase();
 		} catch (DataAccessException e) {
 			System.out.println("ERR: database creation failed");
