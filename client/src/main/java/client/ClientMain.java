@@ -5,6 +5,8 @@ import ui.*;
 import service.*;
 import server.*;
 
+import java.util.List;
+
 public class ClientMain {
 	public static void main(String[] args) {
 		ServerFacade sf = new ServerFacade();
@@ -12,7 +14,7 @@ public class ClientMain {
 
 		do {
 			AuthData auth = prelogin(sf);
-			GameData game = postlogin(auth, sf);
+			game = postlogin(auth, sf);
 		} while (null == game);
 	}
 
@@ -52,7 +54,8 @@ public class ClientMain {
 			tui.step();
 			switch (tui.getLastCommand()) {
 				case "create" -> {
-					GameData game = sf.createGame(tui.getLastUserResponse());
+					List<String> req = List.of(authToken, tui.getLastUserResponse().get(0));
+					GameData game = sf.createGame(req);
 					if (null == game) {
 						tui.createSuccess(null);
 					} else {
@@ -61,12 +64,14 @@ public class ClientMain {
 				}
 
 				case "list" -> {
-					List<GameData> games = sf.getGames();
+					List<GameData> games = sf.listGames(authToken);
 					tui.showGames(games);
 				}
 
 				case "join" -> {
-					GameData game = sf.joinGame(tui.getLastUserResponse());
+					List<String> resp = tui.getLastUserResponse();
+					List<String> req = List.of(authToken, resp.get(0), resp.get(1));
+					GameData game = sf.joinGame(req);
 					if (null == game) {
 						tui.joinGameSuccess(false);
 					} else {

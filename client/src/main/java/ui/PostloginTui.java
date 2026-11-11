@@ -1,5 +1,7 @@
 package ui;
 
+import service.*;
+
 import java.util.Scanner;
 import java.util.List;
 
@@ -105,7 +107,12 @@ public class PostloginTui {
 			System.out.print("\tColor (w/b): ");
 			color = input.nextLine();
 		} while (!color.matches("[wWbB]"));
-		lastUserResponse = List.of(number, color);
+		if ("w".equals(color.toLowerCase())) {
+			color = "WHITE";
+		} else {
+			color = "BLACK";
+		}
+		lastUserResponse = List.of(color, number);
 	}
 
 	private String getGameNumber() {
@@ -151,8 +158,8 @@ public class PostloginTui {
 			System.out.println("Failed to create game");
 		} else {
 			System.out.println(
-				"Game " + SET_TEXT_COLOR_MAGENTA + name + RESET_TEXT_COLOR +
-				"successfully created"
+				"Game " + EscapeSequences.SET_TEXT_COLOR_MAGENTA + name + EscapeSequences.RESET_TEXT_COLOR +
+				" successfully created"
 			);
 		}
 	}
@@ -161,7 +168,7 @@ public class PostloginTui {
 		for (int i = 0; i < games.size(); i++) {
 			System.out.println(
 				"\t" + (i+1) + ": " +
-				SET_TEXT_COLOR_MAGENTA + games[i].gameName + RESET_TEXT_COLOR
+				EscapeSequences.SET_TEXT_COLOR_MAGENTA + games.get(i).gameName() + EscapeSequences.RESET_TEXT_COLOR
 			);
 		}
 	}
