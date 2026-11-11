@@ -145,4 +145,48 @@ public class PostloginTui {
 	public List<String> getLastUserResponse() {
 		return lastUserResponse;
 	}
+
+	public void createSuccess(String name) {
+		if (null == name) {
+			System.out.println("Failed to create game");
+		} else {
+			System.out.println(
+				"Game " + SET_TEXT_COLOR_MAGENTA + name + RESET_TEXT_COLOR +
+				"successfully created"
+			);
+		}
+	}
+
+	public void showGames(List<GameData> games) {
+		for (int i = 0; i < games.size(); i++) {
+			System.out.println(
+				"\t" + (i+1) + ": " +
+				SET_TEXT_COLOR_MAGENTA + games[i].gameName + RESET_TEXT_COLOR
+			);
+		}
+	}
+
+	public void joinGameSuccess(boolean succeeded) {
+		if (!succeeded) {
+			System.out.println("Failed to join game");
+		} else {
+			System.out.println("Joined game successfully!");
+		}
+	}
+
+	public void observeGameSuccess(boolean succeeded) {
+		if (!succeeded) {
+			System.out.println("Failed to observe game");
+		} else {
+			System.out.println("Observing successfully");
+		}
+	}
+
+	public void logoutSuccess(boolean succeeded) {
+		if (!succeeded) {
+			System.out.println("Failed to logout");
+		} else {
+			System.out.println("Successfully logged out");
+		}
+	}
 }

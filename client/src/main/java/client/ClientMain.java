@@ -53,11 +53,15 @@ public class ClientMain {
 			switch (tui.getLastCommand()) {
 				case "create" -> {
 					GameData game = sf.createGame(tui.getLastUserResponse());
-					tui.createSuccess(null != game);
+					if (null == game) {
+						tui.createSuccess(null);
+					} else {
+						tui.createSuccess(game.gameName());
+					}
 				}
 
 				case "list" -> {
-					Collection<GameData> games = sf.getGames();
+					List<GameData> games = sf.getGames();
 					tui.showGames(games);
 				}
 
