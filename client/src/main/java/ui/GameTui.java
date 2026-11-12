@@ -119,7 +119,11 @@ public class GameTui {
 				against = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
 			}
 		}
-		System.out.println("VS: " + against);
+		if (isWhite) {
+			System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR + " VS " + against);
+		} else {
+			System.out.println(against + " VS " + EscapeSequences.SET_TEXT_COLOR_BLUE + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR);
+		}
 		String letters = "  abcdefgh";
 		if (!isWhite) {
 			letters = "  hgfedcba";

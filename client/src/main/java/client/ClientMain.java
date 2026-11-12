@@ -124,7 +124,7 @@ public class ClientMain {
 			}
 
 			case "observe" -> {
-				GameData game = sf.loadGame(tui.getLastUserResponse());
+				GameData game = sf.loadGame(List.of(authToken, tui.getLastUserResponse().get(0)));
 				if (null == game) {
 					tui.observeGameSuccess(false);
 				} else {

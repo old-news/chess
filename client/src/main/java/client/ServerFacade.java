@@ -72,13 +72,9 @@ public class ServerFacade {
 			if (null == games) {
 				listGames(data.get(0));
 			}
-			int gameID = 0;
-			while (0 == gameID) {
-				try {
-					gameID = games.get(Integer.parseInt(data.get(2)) - 1).gameID();
-				} catch (IndexOutOfBoundsException e) {
-					return null;
-				}
+			Integer gameID = getGameIDByUserIndex(Integer.parseInt(data.get(2)));
+			if (null == gameID) {
+				return null;
 			}
 			JoinGameRequest req = new JoinGameRequest(data.get(0), data.get(1), gameID);
 			JoinGameResult res = gs.joinGame(req);
@@ -88,12 +84,25 @@ public class ServerFacade {
 		}
 	}
 
+	private Integer getGameIDByUserIndex(int index) {
+			try {
+				Integer gameID = games.get(index - 1).gameID();
+				return gameID;
+			} catch (IndexOutOfBoundsException e) {
+				return null;
+			}
+	}
+
 	public GameData getGame(int gameID) {
 		return da.findGame(gameID);
 	}
 
 	public GameData loadGame(List<String> data) {
-		return null;
+		if (da.findAuth(data.get(0)) == null) {
+			return null;
+		}
+		Integer gid = getGameIDByUserIndex(Integer.parseInt(data.get(1)));
+		return getGame(gid);
 	}
 
 	public boolean logout(String authToken) {
