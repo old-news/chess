@@ -18,11 +18,11 @@ public class ServerFacade {
 		da = new SQLAccess();
 		us = new UserService(da);
 		gs = new GameService(da);
-		games = null;
+		games = new ArrayList();
 	}
 
-	public void run(int n) {
-		return;
+	public int run(int n) {
+		return n;
 	}
 
 	public void stop() {
@@ -50,6 +50,7 @@ public class ServerFacade {
 	public GameData createGame(List<String> data) {
 		try {
 			CreateGameResult res = gs.createGame(new CreateGameRequest(data.get(0), data.get(1)));
+			games.add(res.game());
 			return res.game();
 		} catch (DataAccessException e) {
 			return null;
@@ -102,5 +103,11 @@ public class ServerFacade {
 		} catch (DataAccessException e) {
 			return false;
 		}
+	}
+
+	public void clear() {
+		da.clearUsers();
+		da.clearAuth();
+		da.clearGames();
 	}
 }
