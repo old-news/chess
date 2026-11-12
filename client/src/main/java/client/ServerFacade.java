@@ -80,7 +80,6 @@ public class ServerFacade {
 				}
 			}
 			JoinGameRequest req = new JoinGameRequest(data.get(0), data.get(1), gameID);
-			System.out.println(req);
 			JoinGameResult res = gs.joinGame(req);
 			return res.game();
 		} catch (DataAccessException e) {

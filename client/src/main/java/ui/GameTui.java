@@ -22,9 +22,13 @@ public class GameTui {
 	}
 
 	public void step() {
-		System.out.print(username + " >> ");
+		printCommandPrompt();
 		String command = input.nextLine();
 		runCommand(command);
+	}
+
+	private static void printCommandPrompt() {
+		System.out.print(username + " >> ");
 	}
 
 	private void runCommand(String command) {
@@ -105,10 +109,17 @@ public class GameTui {
 	public void display(GameData game) {
 		System.out.print(EscapeSequences.ERASE_SCREEN);
 		boolean isWhite = null == game.blackUsername() || !(game.blackUsername().equals(plainUsername));
-		System.out.println("Iswhite: " + isWhite);
-		System.out.println("whitename: " + game.whiteUsername());
-		System.out.println("blackname: " + game.blackUsername());
-		System.out.println("myname: " + plainUsername);
+		String against = EscapeSequences.SET_TEXT_COLOR_RED + "Nobody" + EscapeSequences.RESET_TEXT_COLOR;
+		if (isWhite) {
+			if (null != game.blackUsername()) {
+				against = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			}
+		} else {
+			if (null != game.whiteUsername()) {
+				against = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			}
+		}
+		System.out.println("VS: " + against);
 		String letters = "  abcdefgh";
 		if (!isWhite) {
 			letters = "  hgfedcba";
@@ -135,6 +146,9 @@ public class GameTui {
 					fgcolor = EscapeSequences.SET_TEXT_COLOR_BLUE;
 				} else {
 					fgcolor = blackBG ? EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY : EscapeSequences.SET_TEXT_COLOR_DARK_GREY;
+					if (null == game.whiteUsername() || null == game.blackUsername()) {
+						fgcolor = EscapeSequences.SET_TEXT_COLOR_RED;
+					}
 				}
 				System.out.print(bgcolor + fgcolor + piece + EscapeSequences.RESET_BG_COLOR);
 				// System.out.print("x ");
@@ -142,5 +156,6 @@ public class GameTui {
 			System.out.println(EscapeSequences.RESET_TEXT_COLOR + " " + numbers.charAt(row));
 		}
 		System.out.println(letters);
+		printCommandPrompt();
 	}
 }
