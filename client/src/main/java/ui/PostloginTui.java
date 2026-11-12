@@ -168,11 +168,11 @@ public class PostloginTui {
 		String nobody = EscapeSequences.SET_TEXT_COLOR_RED + "Nobody" + EscapeSequences.RESET_TEXT_COLOR;
 		for (int i = 0; i < games.size(); i++) {
 			GameData game = games.get(i);
-			String white = EscapeSequences.SET_TEXT_COLOR_BLUE + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
-			String black = EscapeSequences.SET_TEXT_COLOR_BLUE + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			String white = EscapeSequences.SET_TEXT_COLOR_MAGENTA + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			String black = EscapeSequences.SET_TEXT_COLOR_MAGENTA + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
 			System.out.println(
 				"\t" + (i+1) + ": " +
-				EscapeSequences.SET_TEXT_COLOR_MAGENTA + game.gameName() + EscapeSequences.RESET_TEXT_COLOR + " with " +
+				EscapeSequences.SET_TEXT_COLOR_GREEN + game.gameName() + EscapeSequences.RESET_TEXT_COLOR + " with " +
 				((null == game.whiteUsername()) ? nobody : white) + " VS " +
 				((null == game.blackUsername()) ? nobody : black)
 			);
@@ -181,7 +181,7 @@ public class PostloginTui {
 
 	public void joinGameSuccess(boolean succeeded) {
 		if (!succeeded) {
-			System.out.println("Failed to join game - enter a valid game number");
+			System.out.println("Failed to join game - enter a valid game number/color");
 		} else {
 			System.out.println("Joined game successfully!");
 		}

@@ -106,24 +106,34 @@ public class GameTui {
 		System.out.println("Previous command failed due to server error");
 	}
 
-	public void display(GameData game) {
+	public void display(GameData game, ChessGame.TeamColor color) {
 		System.out.print(EscapeSequences.ERASE_SCREEN);
-		boolean isWhite = null == game.blackUsername() || !(game.blackUsername().equals(plainUsername));
-		String against = EscapeSequences.SET_TEXT_COLOR_RED + "Nobody" + EscapeSequences.RESET_TEXT_COLOR;
+		boolean isWhite = ChessGame.TeamColor.WHITE == color;
+		boolean observing = false;
+		String whiteUsername, blackUsername;
 		if (isWhite) {
-			if (null != game.blackUsername()) {
-				against = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
-			}
+			observing = !plainUsername.equals(game.whiteUsername());
 		} else {
-			if (null != game.whiteUsername()) {
-				against = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
-			}
+			observing = !plainUsername.equals(game.blackUsername());
 		}
+		String mycolorFGcolor = observing ? EscapeSequences.SET_TEXT_COLOR_MAGENTA : EscapeSequences.SET_TEXT_COLOR_BLUE;
 		if (isWhite) {
-			System.out.println(EscapeSequences.SET_TEXT_COLOR_BLUE + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR + " VS " + against);
+			whiteUsername = mycolorFGcolor + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			blackUsername = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
 		} else {
-			System.out.println(against + " VS " + EscapeSequences.SET_TEXT_COLOR_BLUE + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR);
+			whiteUsername = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
+			blackUsername = mycolorFGcolor + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
 		}
+		String nobody = EscapeSequences.SET_TEXT_COLOR_RED + "Nobody" + EscapeSequences.RESET_TEXT_COLOR;
+		if (null == game.whiteUsername()) {
+			whiteUsername = nobody;
+		}
+		if (null == game.blackUsername()) {
+			blackUsername = nobody;
+		}
+		String against = nobody;
+		String myname = isWhite ? whiteUsername : blackUsername;
+		System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + game.gameName() + EscapeSequences.RESET_TEXT_COLOR + ": " + whiteUsername + " VS " + blackUsername);
 		String letters = "  abcdefgh";
 		if (!isWhite) {
 			letters = "  hgfedcba";
@@ -146,11 +156,12 @@ public class GameTui {
 				String bgcolor = blackBG ? EscapeSequences.SET_BG_COLOR_BLACK : EscapeSequences.SET_BG_COLOR_WHITE;
 				String fgcolor;
 				char piece = rowstr.charAt(coli);
-				if (piece < 96 && isWhite || piece > 96 && !isWhite) {
-					fgcolor = EscapeSequences.SET_TEXT_COLOR_BLUE;
+				boolean whitePiece = piece < 96;
+				if (myname != nobody && (whitePiece && isWhite || !whitePiece && !isWhite)) {
+					fgcolor = mycolorFGcolor;
 				} else {
 					fgcolor = blackBG ? EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY : EscapeSequences.SET_TEXT_COLOR_DARK_GREY;
-					if (null == game.whiteUsername() || null == game.blackUsername()) {
+					if ((null == game.whiteUsername() && whitePiece) || (null == game.blackUsername() && !whitePiece)) {
 						fgcolor = EscapeSequences.SET_TEXT_COLOR_RED;
 					}
 				}

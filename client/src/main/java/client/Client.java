@@ -166,12 +166,12 @@ public class Client {
 
 	private void play() {
 		GameTui tui = new GameTui(auth.username());
-		tui.display(game);
+		tui.display(game, color);
 		while (true) {
 			GameData loadedGame = sf.getGame(game.gameID());
 			if (!(game.equals(loadedGame))) {
 				game = loadedGame;
-				tui.display(game);
+				tui.display(game, color);
 			}
 			try {
 				Thread.sleep(1000);
