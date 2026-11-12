@@ -134,12 +134,12 @@ public class Client {
 			}
 
 			case "observe" -> {
-				GameData game = sf.loadGame(List.of(authToken, tui.getLastUserResponse().get(0)));
+				GameData game = sf.loadGame(List.of(authToken, tui.getLastUserResponse().get(1)));
 				if (null == game) {
 					tui.observeGameSuccess(false);
 				} else {
 					tui.observeGameSuccess(true);
-					color = ChessGame.TeamColor.WHITE;
+					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
 					return game;
 				}
 			}

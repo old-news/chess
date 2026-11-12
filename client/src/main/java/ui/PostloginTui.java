@@ -99,19 +99,7 @@ public class PostloginTui {
 
 	private void commandJoin() {
 		String number = getGameNumber();
-		String color = null;
-		do {
-			if (null != color) {
-				System.out.println("You must submit 'w' (white) or 'b' (black) as your color");
-			}
-			System.out.print("\tColor (w/b): ");
-			color = input.nextLine();
-		} while (!color.matches("[wWbB]"));
-		if ("w".equals(color.toLowerCase())) {
-			color = "WHITE";
-		} else {
-			color = "BLACK";
-		}
+		String color = getGameColor();
 		lastUserResponse = List.of(color, number);
 	}
 
@@ -127,9 +115,27 @@ public class PostloginTui {
 		return number;
 	}
 
+	private String getGameColor() {
+		String color = null;
+		do {
+			if (null != color) {
+				System.out.println("You must submit 'w' (white) or 'b' (black) as your color");
+			}
+			System.out.print("\tColor (w/b): ");
+			color = input.nextLine();
+		} while (!color.matches("[wWbB]"));
+		if ("w".equals(color.toLowerCase())) {
+			color = "WHITE";
+		} else {
+			color = "BLACK";
+		}
+		return color;
+	}
+
 	private void commandObserve() {
 		String number = getGameNumber();
-		lastUserResponse = List.of(number);
+		String color = getGameColor();
+		lastUserResponse = List.of(color, number);
 	}
 
 	private void commandLogout() {
