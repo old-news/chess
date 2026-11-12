@@ -88,6 +88,10 @@ public class ServerFacade {
 		}
 	}
 
+	public GameData getGame(int gameID) {
+		return da.findGame(gameID);
+	}
+
 	public GameData loadGame(List<String> data) {
 		return null;
 	}

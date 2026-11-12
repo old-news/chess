@@ -121,7 +121,7 @@ public class ChessBoard extends DefaultEqualsHashcode implements Cloneable {
                 var pos = new ChessPosition(row, col);
                 var piece = getPiece(pos);
                 if (null == piece) {
-                    retval += '.';
+                    retval += ' ';
                     continue;
                 }
                 retval += piece.toString();

@@ -154,6 +154,17 @@ public class ClientMain {
 	}
 
 	private static void play(GameData game, AuthData auth, ServerFacade sf) {
-		return;
+		GameTui tui = new GameTui(auth.username());
+		tui.display(game);
+		while (true) {
+			GameData loadedGame = sf.getGame(game.gameID());
+			if (!(game.equals(loadedGame))) {
+				game = loadedGame;
+				tui.display(game);
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+		}
 	}
 }
