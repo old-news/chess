@@ -113,8 +113,8 @@ public class ServerFacade {
 	private GameData gameFromJson(String json) {
 		GameData res = serializer.fromJson(json, GameData.class);
 		Map<String, Object> tree = serializer.fromJson(json, HashMap.class);
-		int gameID = ((Double) tree.get("gameID")).intValue();
 		Map<String, Object> minitree = (Map) tree.get("game");
+		int gameID = ((Double) minitree.get("gameID")).intValue();
 		String gameName = (String) minitree.get("gameName");
 		String whiteName = (String) minitree.get("whiteUsername");
 		String blackName = (String) minitree.get("blackUsername");
@@ -124,28 +124,42 @@ public class ServerFacade {
 
 	public List<GameData> listGames(String authToken) {
 		try {
-			ListGamesResult res = gs.listGames(new ListGamesRequest(authToken));
-			games = new ArrayList(res.games()); 
-			return games;
-		} catch (DataAccessException e) {
-			return null;
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "game"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.GET()
+				.header("authorization", authToken)
+				.build();
+			String json = sendReqJson(hreq);
+			System.out.println(json);
+			Type t = new TypeToken<List<GameData>>(){}.getType();
+			System.out.println((List<GameData>) serializer.fromJson(json, t));
+			return List.of();
+			// return serializer.fromJson(json, GameData.class);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public GameData joinGame(List<String> data) {
 		try {
-			if (null == games) {
-				listGames(data.get(0));
-			}
 			Integer gameID = getGameIDByUserIndex(Integer.parseInt(data.get(2)));
 			if (null == gameID) {
 				return null;
 			}
-			JoinGameRequest req = new JoinGameRequest(data.get(0), data.get(1), gameID);
-			JoinGameResult res = gs.joinGame(req);
-			return res.game();
-		} catch (DataAccessException e) {
-			return null;
+			Map<String, Object> req = Map.of("playerColor", data.get(1), "gameID", gameID);
+			System.out.println(data);
+			System.out.println(req);
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "game"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.PUT(HttpRequest.BodyPublishers.ofString(serializer.toJson(req)))
+				.header("authorization", data.get(0))
+				.build();
+			String json = sendReqJson(hreq);
+			return gameFromJson(json);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -175,16 +189,30 @@ public class ServerFacade {
 
 	public boolean logout(String authToken) {
 		try {
-			LogoutResult res = us.logout(new LogoutRequest(authToken));
-			return res.succeeded();
-		} catch (DataAccessException e) {
-			return false;
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "session"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.DELETE()
+				.header("authorization", authToken)
+				.build();
+			Map<String, Object> res = sendReq(hreq);
+			return "true".equals(res.get("success"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public void clear() {
-		da.clearUsers();
-		da.clearAuth();
-		da.clearGames();
+		try {
+			// Map<String, Object> req = Map.of("playerColor", data.get(1), "gameID", gameID);
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "db"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.DELETE()
+				.build();
+			Map<String, Object> res = sendReq(hreq);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
