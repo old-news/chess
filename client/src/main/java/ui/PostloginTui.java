@@ -88,8 +88,14 @@ public class PostloginTui {
 	}
 
 	private void commandCreate() {
-		System.out.print("\tGame Name: ");
-		String name = input.nextLine();
+		String name = null;
+		do {
+			if (null != name) {
+				System.out.println("You must submit a name that has at least 1 character");
+			}
+			System.out.print("\tGame Name: ");
+			name = input.nextLine();
+		} while (name.isEmpty());
 		lastUserResponse = List.of(name);
 	}
 
@@ -164,7 +170,7 @@ public class PostloginTui {
 			System.out.println("Failed to create game");
 		} else {
 			System.out.println(
-				"Game " + EscapeSequences.SET_TEXT_COLOR_MAGENTA + name + EscapeSequences.RESET_TEXT_COLOR +
+				"Game " + EscapeSequences.SET_TEXT_COLOR_GREEN + name + EscapeSequences.RESET_TEXT_COLOR +
 				" successfully created"
 			);
 		}

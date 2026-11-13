@@ -102,6 +102,9 @@ public class ServerFacade {
 			return null;
 		}
 		Integer gid = getGameIDByUserIndex(Integer.parseInt(data.get(1)));
+		if (null == gid) {
+			return null;
+		}
 		return getGame(gid);
 	}
 

@@ -106,17 +106,16 @@ public class GameTui {
 		System.out.println("Previous command failed due to server error");
 	}
 
-	public void display(GameData game, ChessGame.TeamColor color) {
+	public void display(GameData game, ChessGame.TeamColor color, boolean observing) {
 		System.out.print(EscapeSequences.ERASE_SCREEN);
 		boolean isWhite = ChessGame.TeamColor.WHITE == color;
-		boolean observing = false;
+		boolean whiteTurn = game.game().getTeamTurn() == ChessGame.TeamColor.WHITE;
 		String whiteUsername, blackUsername;
-		if (isWhite) {
-			observing = !plainUsername.equals(game.whiteUsername());
-		} else {
-			observing = !plainUsername.equals(game.blackUsername());
-		}
 		String mycolorFGcolor = observing ? EscapeSequences.SET_TEXT_COLOR_MAGENTA : EscapeSequences.SET_TEXT_COLOR_BLUE;
+		String borderBG = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+		if (isWhite && whiteTurn || !isWhite && !whiteTurn) {
+			borderBG = observing ? EscapeSequences.SET_BG_COLOR_MAGENTA : EscapeSequences.SET_BG_COLOR_BLUE;
+		}
 		if (isWhite) {
 			whiteUsername = mycolorFGcolor + game.whiteUsername() + EscapeSequences.RESET_TEXT_COLOR;
 			blackUsername = EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY + game.blackUsername() + EscapeSequences.RESET_TEXT_COLOR;
@@ -146,10 +145,11 @@ public class GameTui {
 		String boardStr = board.toString();
 		String[] boardRows = boardStr.split("\n");
 		System.out.println(letters);
+		System.out.println(" " + borderBG + "          " + EscapeSequences.RESET_BG_COLOR);
 		for (int row = 0; row < 8; row++) {
 			int rowi = isWhite ? row : 7 - row;
 			String rowstr = boardRows[rowi];
-			System.out.print(numbers.charAt(row) + " ");
+			System.out.print(numbers.charAt(row) + borderBG + " " + EscapeSequences.RESET_BG_COLOR);
 			for (int col = 0; col < 8; col++) {
 				int coli = isWhite ? col : 7 - col;
 				boolean blackBG = ((coli + rowi) % 2 == 0);
@@ -168,8 +168,9 @@ public class GameTui {
 				System.out.print(bgcolor + fgcolor + piece + EscapeSequences.RESET_BG_COLOR);
 				// System.out.print("x ");
 			}
-			System.out.println(EscapeSequences.RESET_TEXT_COLOR + " " + numbers.charAt(row));
+			System.out.println(EscapeSequences.RESET_TEXT_COLOR + borderBG + " " + EscapeSequences.RESET_BG_COLOR + numbers.charAt(row));
 		}
+		System.out.println(" " + borderBG + "          " + EscapeSequences.RESET_BG_COLOR);
 		System.out.println(letters);
 		printCommandPrompt();
 	}

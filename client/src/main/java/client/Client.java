@@ -12,6 +12,8 @@ public class Client {
 	private ServerFacade sf;
 	private GameData game;
 	private boolean loggedIn;
+	private boolean listedGames;
+	private boolean observing;
 	private AuthData auth;
 	private ChessGame.TeamColor color;
 
@@ -19,6 +21,8 @@ public class Client {
 		sf = new ServerFacade();
 		game = null;
 		loggedIn = false;
+		listedGames = false;
+		observing = false;
 		auth = null;
 		color = ChessGame.TeamColor.WHITE;
 	}
@@ -26,6 +30,8 @@ public class Client {
 	public void run() {
 		greet();
 		while (true) {
+			listedGames = false;
+			observing = false;
 			if (!loggedIn) {
 				prelogin();
 			}
@@ -118,6 +124,7 @@ public class Client {
 			case "list" -> {
 				List<GameData> games = sf.listGames(authToken);
 				tui.showGames(games);
+				listedGames = true;
 			}
 
 			case "join" -> {
@@ -140,6 +147,7 @@ public class Client {
 				} else {
 					tui.observeGameSuccess(true);
 					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+					observing = true;
 					return game;
 				}
 			}
@@ -166,12 +174,12 @@ public class Client {
 
 	private void play() {
 		GameTui tui = new GameTui(auth.username());
-		tui.display(game, color);
+		tui.display(game, color, observing);
 		while (true) {
 			GameData loadedGame = sf.getGame(game.gameID());
 			if (!(game.equals(loadedGame))) {
 				game = loadedGame;
-				tui.display(game, color);
+				tui.display(game, color, observing);
 			}
 			try {
 				Thread.sleep(1000);
