@@ -132,11 +132,9 @@ public class ServerFacade {
 				.header("authorization", authToken)
 				.build();
 			String json = sendReqJson(hreq);
-			System.out.println(json);
-			Type t = new TypeToken<List<GameData>>(){}.getType();
-			System.out.println((List<GameData>) serializer.fromJson(json, t));
-			return List.of();
-			// return serializer.fromJson(json, GameData.class);
+			Type t = new TypeToken<Map<String, List<GameData>>>(){}.getType();
+			List<GameData> games = (List<GameData>) ((Map<String, List<GameData>>) serializer.fromJson(json, t)).get("games");
+			return games;
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
