@@ -45,19 +45,19 @@ public class PreloginTui {
 
 	private static void commandHelp() {
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "register" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "register" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create an account"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "login" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "login" + EscapeSequences.RESET_TEXT_COLOR +
 			" - login to an existing account"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "quit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "help" + EscapeSequences.RESET_TEXT_COLOR +
 			" - display this message"
 		);
 	}
@@ -122,8 +122,8 @@ public class PreloginTui {
 		}
 	}
 
-	public void internalError() {
-		System.out.println("Previous command failed due to server error");
+	public void internalError(String code) {
+		System.out.println("Previous command failed due to server error, ERR CODE: " + code);
 	}
 
 	public static void greet() {

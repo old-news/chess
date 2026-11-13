@@ -1,60 +1,125 @@
 package client;
 
-import server.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import io.javalin.http.InternalServerErrorResponse;
 import service.*;
 import dataaccess.*;
 import dataaccess.sql.*;
+import server.*;
+import chess.*;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Locale;
 
 public class ServerFacade {
-	private DataAccess da;
+	private List<GameData> games;
+	private int port;
+	private String url;
+	private static HttpClient httpClient;
+	private Gson serializer;
 	private UserService us;
 	private GameService gs;
-	private List<GameData> games;
+	private DataAccess da;
 
-	public ServerFacade() {
+	public ServerFacade(int p) {
+		games = new ArrayList();
+		port = p;
+		url = String.format("http://localhost:%d/", p);
+		httpClient = HttpClient.newHttpClient();
+		serializer = new Gson().newBuilder().serializeNulls().enableComplexMapKeySerialization().create();
+		// serializer = new Gson();
 		da = new SQLAccess();
 		us = new UserService(da);
 		gs = new GameService(da);
-		games = new ArrayList();
-	}
-
-	public int run(int n) {
-		return n;
 	}
 
 	public void stop() {
 		return;
 	}
 
-	public AuthData registerUser(List<String> data) {
+	private String sendReqJson(HttpRequest req) {
 		try {
-			RegisterResult res = us.registerUser(new RegisterRequest(data.get(0), data.get(1), data.get(2)));
-			return res.auth();
-		} catch (DataAccessException e) {
-			return null;
+			HttpResponse<String> res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
+			if (res.statusCode() >= 300 || res.statusCode() < 200) {
+				throw new InternalServerErrorResponse(Integer.toString(res.statusCode()));
+			}
+			return res.body();
+		} catch (InterruptedException | IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
+	private Map<String, Object> sendReq(HttpRequest req) {
+		return serializer.fromJson(sendReqJson(req), HashMap.class);
+	}
+
+	public AuthData registerUser(List<String> data) {
+		try {
+			Map<String, String> req = Map.of("username", data.get(0), "password", data.get(1), "email", data.get(2));
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "user"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.POST(HttpRequest.BodyPublishers.ofString(serializer.toJson(req)))
+				.build();
+			Map<String, Object> res = sendReq(hreq);
+			return new AuthData((String) res.get("username"), (String) res.get("authToken"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+    }
+
 	public AuthData login(List<String> data) {
 		try {
-			LoginResult res = us.login(new LoginRequest(data.get(0), data.get(1)));
-			return res.auth();
-		} catch (DataAccessException e) {
-			return null;
+			Map<String, String> req = Map.of("username", data.get(0), "password", data.get(1));
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "session"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.POST(HttpRequest.BodyPublishers.ofString(serializer.toJson(req)))
+				.build();
+			Map<String, Object> res = sendReq(hreq);
+			return new AuthData((String) res.get("username"), (String) res.get("authToken"));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	public GameData createGame(List<String> data) {
 		try {
-			CreateGameResult res = gs.createGame(new CreateGameRequest(data.get(0), data.get(1)));
-			games.add(res.game());
-			return res.game();
-		} catch (DataAccessException e) {
-			return null;
+			Map<String, String> req = Map.of("gameName", data.get(1));
+			HttpRequest hreq = HttpRequest.newBuilder()
+				.uri(new URI(url + "game"))
+				.timeout(java.time.Duration.ofMillis(5000))
+				.POST(HttpRequest.BodyPublishers.ofString(serializer.toJson(req)))
+				.header("authorization", data.get(0))
+				.build();
+			String json = sendReqJson(hreq);
+			return gameFromJson(json);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
 		}
+	}
+
+	private GameData gameFromJson(String json) {
+		GameData res = serializer.fromJson(json, GameData.class);
+		Map<String, Object> tree = serializer.fromJson(json, HashMap.class);
+		int gameID = ((Double) tree.get("gameID")).intValue();
+		Map<String, Object> minitree = (Map) tree.get("game");
+		String gameName = (String) minitree.get("gameName");
+		String whiteName = (String) minitree.get("whiteUsername");
+		String blackName = (String) minitree.get("blackUsername");
+		res = new GameData(gameID, whiteName, blackName, gameName, res.game());
+		return res;
 	}
 
 	public List<GameData> listGames(String authToken) {

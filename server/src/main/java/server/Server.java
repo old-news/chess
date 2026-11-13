@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.javalin.*;
 
 public class Server {
@@ -11,7 +12,7 @@ public class Server {
 
     public Server() {
 	    handler = new Handler();
-	    serializer = new Gson();
+	    serializer = new GsonBuilder().serializeNulls().create();
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -39,6 +40,9 @@ public class Server {
     private void updateCTX(io.javalin.http.Context ctx, HandlerResult res) {
 	    ctx.status(res.status());
 	    String jsonified = serializer.toJson(res.body());
+	    System.out.println(res.body());
+	    System.out.println("------------------------------------------");
+	    System.out.println(jsonified);
 	    ctx.result(jsonified);
     }
 

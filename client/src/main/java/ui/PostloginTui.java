@@ -58,31 +58,31 @@ public class PostloginTui {
 
 	private static void commandHelp() {
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "create" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "create" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create a game"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "list" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "list" + EscapeSequences.RESET_TEXT_COLOR +
 			" - list all games"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "join" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "join" + EscapeSequences.RESET_TEXT_COLOR +
 			" - join a game"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "observe" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "observe" + EscapeSequences.RESET_TEXT_COLOR +
 			" - observe a game"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "logout" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "logout" + EscapeSequences.RESET_TEXT_COLOR +
 			" - logout of the server"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "quit" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "quit" + EscapeSequences.RESET_TEXT_COLOR +
 			" - exit the program"
 		);
 		System.out.println("\t" +
-			EscapeSequences.SET_TEXT_COLOR_GREEN + "help" + EscapeSequences.RESET_TEXT_COLOR +
+			EscapeSequences.SET_TEXT_COLOR_YELLOW + "help" + EscapeSequences.RESET_TEXT_COLOR +
 			" - display this message"
 		);
 	}
@@ -215,7 +215,7 @@ public class PostloginTui {
 		}
 	}
 
-	public void internalError() {
-		System.out.println("Previous command failed due to server error");
+	public void internalError(String code) {
+		System.out.println("Previous command failed due to server error, ERR CODE: " + code);
 	}
 }

@@ -18,7 +18,7 @@ public class Client {
 	private ChessGame.TeamColor color;
 
 	public Client() {
-		sf = new ServerFacade();
+		sf = new ServerFacade(8080);
 		game = null;
 		loggedIn = false;
 		listedGames = false;
@@ -60,7 +60,7 @@ public class Client {
 					return;
 				}
 			} catch (InternalServerErrorResponse e) {
-				pretui.internalError();
+				pretui.internalError(e.getMessage());
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class Client {
 					return game;
 				}
 			} catch (InternalServerErrorResponse e) {
-				tui.internalError();
+				tui.internalError(e.getMessage());
 			}
 		}
 	}

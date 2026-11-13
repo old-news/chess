@@ -11,13 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
-    private static ServerFacade server;
+    private static ServerFacade sf;
     private static AuthData auth;
 
     @BeforeAll
     public static void init() {
-        server = new ServerFacade();
+        server = new Server();
         var port = server.run(0);
+	sf = new ServerFacade(port);
         System.out.println("Started test HTTP server on " + port);
 	server.clear();
     }
