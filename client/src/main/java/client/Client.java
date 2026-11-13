@@ -59,8 +59,8 @@ public class Client {
 				if (null != auth) {
 					return;
 				}
-			} catch (InternalServerErrorResponse e) {
-				pretui.internalError(e.getMessage());
+			} catch (RuntimeException e) {
+				pretui.error(e.getMessage());
 			}
 		}
 	}
@@ -102,8 +102,8 @@ public class Client {
 					}
 					return game;
 				}
-			} catch (InternalServerErrorResponse e) {
-				tui.internalError(e.getMessage());
+			} catch (RuntimeException e) {
+				tui.error(e.getMessage());
 			}
 		}
 	}

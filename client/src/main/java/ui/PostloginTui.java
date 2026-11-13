@@ -215,7 +215,7 @@ public class PostloginTui {
 		}
 	}
 
-	public void internalError(String code) {
-		System.out.println("Previous command failed due to server error, ERR CODE: " + code);
+	public void error(String msg) {
+		System.out.println("Previous command failed due to " + msg);
 	}
 }

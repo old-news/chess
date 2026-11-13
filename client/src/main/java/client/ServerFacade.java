@@ -52,7 +52,8 @@ public class ServerFacade {
 		try {
 			HttpResponse<String> res = httpClient.send(req, HttpResponse.BodyHandlers.ofString());
 			if (res.statusCode() >= 300 || res.statusCode() < 200) {
-				throw new InternalServerErrorResponse(Integer.toString(res.statusCode()));
+				String message = (String) ((Map) serializer.fromJson(res.body(), Map.class)).get("message");
+				throw new RuntimeException(message + " (" + Integer.toString(res.statusCode()) + ")");
 			}
 			return res.body();
 		} catch (InterruptedException | IOException e) {
