@@ -133,8 +133,9 @@ public class ServerFacade {
 				.build();
 			String json = sendReqJson(hreq);
 			Type t = new TypeToken<Map<String, List<GameData>>>(){}.getType();
-			List<GameData> games = (List<GameData>) ((Map<String, List<GameData>>) serializer.fromJson(json, t)).get("games");
-			return games;
+			List<GameData> foundGames = (List<GameData>) ((Map<String, List<GameData>>) serializer.fromJson(json, t)).get("games");
+			games = foundGames;
+			return foundGames;
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
@@ -142,6 +143,9 @@ public class ServerFacade {
 
 	public GameData joinGame(List<String> data) {
 		try {
+			if (games.isEmpty()) {
+				listGames(data.get(0));
+			}
 			Integer gameID = getGameIDByUserIndex(Integer.parseInt(data.get(2)));
 			if (null == gameID) {
 				return null;
@@ -213,5 +217,9 @@ public class ServerFacade {
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public List<GameData> getGames() {
+		return games;
 	}
 }
