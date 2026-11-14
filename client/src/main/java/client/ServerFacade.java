@@ -2,11 +2,9 @@ package client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.javalin.http.InternalServerErrorResponse;
 import service.*;
 import dataaccess.*;
 import dataaccess.sql.*;
-import server.*;
 import chess.*;
 
 import java.io.IOException;
