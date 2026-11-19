@@ -44,8 +44,9 @@ public class ServerFacadeTests {
 	    GameData game2 = sf.joinGame(List.of(auth.authToken(), "WHITE", "1"));
 	    assertNotNull(game2);
 	    assertFalse(game.equals(game2));
-	    assertTrue(2 == sf.listGames(auth.authToken()).size());
-	    assertEquals(game2, sf.getGame(game2.gameID()));
+	    List<GameData> games = sf.listGames(auth.authToken());
+	    assertTrue(2 == games.size());
+	    assertEquals(game2, games.get(0));
     }
 
     @AfterAll
