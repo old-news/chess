@@ -3,7 +3,7 @@ package client;
 import org.junit.jupiter.api.*;
 import server.Server;
 
-import service.*;
+import dataobjects.*;
 
 import java.util.List;
 
