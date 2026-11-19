@@ -2,9 +2,7 @@ package client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import service.*;
-import dataaccess.*;
-import dataaccess.sql.*;
+import dataobjects.*;
 import chess.*;
 
 import java.io.IOException;
@@ -26,9 +24,6 @@ public class ServerFacade {
 	private String url;
 	private static HttpClient httpClient;
 	private Gson serializer;
-	private UserService us;
-	private GameService gs;
-	private DataAccess da;
 
 	public ServerFacade(int p) {
 		games = new ArrayList();
@@ -37,9 +32,6 @@ public class ServerFacade {
 		httpClient = HttpClient.newHttpClient();
 		serializer = new Gson().newBuilder().serializeNulls().enableComplexMapKeySerialization().create();
 		// serializer = new Gson();
-		da = new SQLAccess();
-		us = new UserService(da);
-		gs = new GameService(da);
 	}
 
 	public void stop() {
@@ -174,18 +166,11 @@ public class ServerFacade {
 	}
 
 	public GameData getGame(int gameID) {
-		return da.findGame(gameID);
+		return null;
 	}
 
 	public GameData loadGame(List<String> data) {
-		if (da.findAuth(data.get(0)) == null) {
-			return null;
-		}
-		Integer gid = getGameIDByUserIndex(Integer.parseInt(data.get(1)));
-		if (null == gid) {
-			return null;
-		}
-		return getGame(gid);
+		return null;
 	}
 
 	public boolean logout(String authToken) {

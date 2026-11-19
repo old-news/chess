@@ -1,6 +1,6 @@
 package dataaccess;
 
-import service.*;
+import dataobjects.*;
 import java.util.Collection;
 import org.mindrot.jbcrypt.BCrypt;
 

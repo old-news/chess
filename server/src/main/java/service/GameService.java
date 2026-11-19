@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import dataobjects.*;
 import chess.ChessGame;
 
 public class GameService {

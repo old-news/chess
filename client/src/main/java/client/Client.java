@@ -2,9 +2,8 @@ package client;
 
 import chess.*;
 import ui.*;
-import service.*;
+import dataobjects.*;
 
-import io.javalin.http.InternalServerErrorResponse;
 import java.util.List;
 
 public class Client {
@@ -176,7 +175,7 @@ public class Client {
 		tui.display(game, color, observing);
 		while (true) {
 			GameData loadedGame = sf.getGame(game.gameID());
-			if (!(game.equals(loadedGame))) {
+			if (!(game.equals(loadedGame)) && null != loadedGame) {
 				game = loadedGame;
 				tui.display(game, color, observing);
 			}

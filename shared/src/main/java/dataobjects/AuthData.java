@@ -1,4 +1,4 @@
-package service;
+package dataobjects;
 
 public record AuthData(
 	String username,

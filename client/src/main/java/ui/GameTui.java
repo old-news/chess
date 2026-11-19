@@ -1,6 +1,6 @@
 package ui;
 
-import service.*;
+import dataobjects.*;
 import chess.*;
 
 import java.util.Scanner;

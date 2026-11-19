@@ -2,6 +2,7 @@ package dataaccess;
 
 import server.*;
 import service.*;
+import dataobjects.*;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;

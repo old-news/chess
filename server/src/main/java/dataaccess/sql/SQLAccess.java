@@ -3,6 +3,7 @@ package dataaccess.sql;
 import dataaccess.*;
 import server.*;
 import service.*;
+import dataobjects.*;
 import chess.ChessGame;
 
 import java.sql.SQLException;

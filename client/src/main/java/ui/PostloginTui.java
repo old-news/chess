@@ -1,6 +1,6 @@
 package ui;
 
-import service.*;
+import dataobjects.*;
 
 import java.util.Scanner;
 import java.util.List;

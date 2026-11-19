@@ -3,6 +3,7 @@ package service;
 import java.util.UUID;
 
 import dataaccess.*;
+import dataobjects.*;
 
 public class UserService {
 	private final DataAccess da;

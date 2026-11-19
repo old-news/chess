@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import dataaccess.sql.*;
 import service.*;
+import dataobjects.*;
 
 import com.google.gson.Gson;
 import io.javalin.http.InternalServerErrorResponse;

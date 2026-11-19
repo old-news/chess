@@ -1,4 +1,4 @@
-package service;
+package dataobjects;
 
 import chess.ChessGame;
 
