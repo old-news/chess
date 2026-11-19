@@ -133,7 +133,9 @@ public class Client {
 					tui.joinGameSuccess(false);
 				} else {
 					tui.joinGameSuccess(true);
-					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ?
+						ChessGame.TeamColor.WHITE :
+						ChessGame.TeamColor.BLACK;
 					return game;
 				}
 			}
@@ -144,7 +146,9 @@ public class Client {
 					tui.observeGameSuccess(false);
 				} else {
 					tui.observeGameSuccess(true);
-					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ?
+						ChessGame.TeamColor.WHITE :
+						ChessGame.TeamColor.BLACK;
 					observing = true;
 					return game;
 				}

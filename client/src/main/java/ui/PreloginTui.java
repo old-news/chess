@@ -3,26 +3,8 @@ package ui;
 import java.util.Scanner;
 import java.util.List;
 
-public class PreloginTui {
-	private static Scanner input;
-	private static String username;
-	private List<String> lastUserResponse;
-	private String lastCommand;
-
-	public PreloginTui () {
-		input = new Scanner(System.in);
-		username = EscapeSequences.SET_TEXT_COLOR_RED + "LOGGED_OUT" + EscapeSequences.RESET_TEXT_COLOR;
-		lastUserResponse = null;
-		lastCommand = null;
-	}
-
-	public void step() {
-		System.out.print(username + " >> ");
-		String command = input.nextLine();
-		runCommand(command);
-	}
-
-	private void runCommand(String command) {
+public class PreloginTui extends Tui{
+	protected void runCommand(String command) {
 		switch (command.toLowerCase()) {
 			case "help" -> {
 				commandHelp();
@@ -43,7 +25,7 @@ public class PreloginTui {
 		lastCommand = command.toLowerCase();
 	}
 
-	private static void commandHelp() {
+	protected void commandHelp() {
 		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_YELLOW + "register" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create an account"
@@ -64,12 +46,6 @@ public class PreloginTui {
 
 	private static void commandQuit() {
 		System.exit(0);
-	}
-
-	private static void commandDoesNotExist(String command) {
-		System.out.println("\t'" + command + "' is an invalid command");
-		System.out.println("\tBelow are the available commands:");
-		commandHelp();
 	}
 
 	private void commandRegister() {
@@ -96,14 +72,6 @@ public class PreloginTui {
 		lastUserResponse = List.of(username, password);
 	}
 
-	public String getLastCommand() {
-		return lastCommand;
-	}
-
-	public List<String> getLastUserResponse() {
-		return lastUserResponse;
-	}
-
 	public void loginSuccess(boolean successful) {
 		if (successful) {
 			username = EscapeSequences.SET_TEXT_COLOR_BLUE + lastUserResponse.getFirst() + EscapeSequences.RESET_TEXT_COLOR;
@@ -120,10 +88,6 @@ public class PreloginTui {
 		} else {
 			System.out.println("Registration failed - try a different username");
 		}
-	}
-
-	public void error(String msg) {
-		System.out.println("Previous command failed due to " + msg);
 	}
 
 	public static void greet() {

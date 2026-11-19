@@ -6,14 +6,8 @@ import chess.*;
 import java.util.Scanner;
 import java.util.List;
 
-public class GameTui {
-	private static Scanner input;
-	private static String username;
-	private static String plainUsername;
-	private List<String> lastUserResponse;
-	private String lastCommand;
-
-	public GameTui(String user) {
+public class GameTui extends Tui {
+	public GameTui (String user) {
 		input = new Scanner(System.in);
 		plainUsername = user;
 		username = EscapeSequences.SET_TEXT_COLOR_BLUE + user + EscapeSequences.RESET_TEXT_COLOR;
@@ -21,17 +15,7 @@ public class GameTui {
 		lastCommand = null;
 	}
 
-	public void step() {
-		printCommandPrompt();
-		String command = input.nextLine();
-		runCommand(command);
-	}
-
-	private static void printCommandPrompt() {
-		System.out.print(username + " >> ");
-	}
-
-	private void runCommand(String command) {
+	protected void runCommand(String command) {
 		switch (command.toLowerCase()) {
 			case "help" -> {
 				commandHelp();
@@ -49,7 +33,7 @@ public class GameTui {
 		lastCommand = command.toLowerCase();
 	}
 
-	private static void commandHelp() {
+	protected void commandHelp() {
 		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_GREEN + "create" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create a game"
@@ -80,30 +64,11 @@ public class GameTui {
 		);
 	}
 
-
 	private void commandLogout() {
 		return;
 	}
 	private static void commandQuit() {
 		return;
-	}
-
-	private static void commandDoesNotExist(String command) {
-		System.out.println("\t'" + command + "' is an invalid command");
-		System.out.println("\tBelow are the available commands:");
-		commandHelp();
-	}
-
-	public String getLastCommand() {
-		return lastCommand;
-	}
-
-	public List<String> getLastUserResponse() {
-		return lastUserResponse;
-	}
-
-	public void internalError() {
-		System.out.println("Previous command failed due to server error");
 	}
 
 	public void display(GameData game, ChessGame.TeamColor color, boolean observing) {
@@ -132,7 +97,10 @@ public class GameTui {
 		}
 		String against = nobody;
 		String myname = isWhite ? whiteUsername : blackUsername;
-		System.out.println(EscapeSequences.SET_TEXT_COLOR_GREEN + game.gameName() + EscapeSequences.RESET_TEXT_COLOR + ": " + whiteUsername + " VS " + blackUsername);
+		System.out.println(
+			EscapeSequences.SET_TEXT_COLOR_GREEN + game.gameName() + EscapeSequences.RESET_TEXT_COLOR +
+			": " + whiteUsername + " VS " + blackUsername
+		);
 		String letters = "  abcdefgh";
 		if (!isWhite) {
 			letters = "  hgfedcba";

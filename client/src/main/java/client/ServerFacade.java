@@ -141,8 +141,6 @@ public class ServerFacade {
 				return null;
 			}
 			Map<String, Object> req = Map.of("playerColor", data.get(1), "gameID", gameID);
-			System.out.println(data);
-			System.out.println(req);
 			HttpRequest hreq = HttpRequest.newBuilder()
 				.uri(new URI(url + "game"))
 				.timeout(java.time.Duration.ofMillis(5000))

@@ -5,13 +5,7 @@ import dataobjects.*;
 import java.util.Scanner;
 import java.util.List;
 
-public class PostloginTui {
-	private static Scanner input;
-	private static String username;
-	private static String plainUsername;
-	private List<String> lastUserResponse;
-	private String lastCommand;
-
+public class PostloginTui extends Tui {
 	public PostloginTui (String user) {
 		input = new Scanner(System.in);
 		plainUsername = user;
@@ -20,13 +14,7 @@ public class PostloginTui {
 		lastCommand = null;
 	}
 
-	public void step() {
-		System.out.print(username + " >> ");
-		String command = input.nextLine();
-		runCommand(command);
-	}
-
-	private void runCommand(String command) {
+	protected void runCommand(String command) {
 		switch (command.toLowerCase()) {
 			case "help" -> {
 				commandHelp();
@@ -56,7 +44,7 @@ public class PostloginTui {
 		lastCommand = command.toLowerCase();
 	}
 
-	private static void commandHelp() {
+	protected void commandHelp() {
 		System.out.println("\t" +
 			EscapeSequences.SET_TEXT_COLOR_YELLOW + "create" + EscapeSequences.RESET_TEXT_COLOR +
 			" - create a game"
@@ -102,6 +90,14 @@ public class PostloginTui {
 	private void commandList() {
 		return;
 	}
+	
+	private void commandLogout() {
+		return;
+	}
+
+	private void commandQuit() {
+		return;
+	}
 
 	private void commandJoin() {
 		String number = getGameNumber();
@@ -142,27 +138,6 @@ public class PostloginTui {
 		String number = getGameNumber();
 		String color = getGameColor();
 		lastUserResponse = List.of(color, number);
-	}
-
-	private void commandLogout() {
-		return;
-	}
-	private static void commandQuit() {
-		return;
-	}
-
-	private static void commandDoesNotExist(String command) {
-		System.out.println("\t'" + command + "' is an invalid command");
-		System.out.println("\tBelow are the available commands:");
-		commandHelp();
-	}
-
-	public String getLastCommand() {
-		return lastCommand;
-	}
-
-	public List<String> getLastUserResponse() {
-		return lastUserResponse;
 	}
 
 	public void createSuccess(String name) {
@@ -213,9 +188,5 @@ public class PostloginTui {
 		} else {
 			System.out.println("Successfully logged out");
 		}
-	}
-
-	public void error(String msg) {
-		System.out.println("Previous command failed due to " + msg);
 	}
 }
