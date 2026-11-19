@@ -163,14 +163,6 @@ public class ServerFacade {
 			}
 	}
 
-	public GameData getGame(int gameID) {
-		return null;
-	}
-
-	public GameData loadGame(List<String> data) {
-		return null;
-	}
-
 	public boolean logout(String authToken) {
 		try {
 			HttpRequest hreq = HttpRequest.newBuilder()

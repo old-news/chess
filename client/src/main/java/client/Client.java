@@ -141,17 +141,20 @@ public class Client {
 			}
 
 			case "observe" -> {
-				GameData game = sf.loadGame(List.of(authToken, tui.getLastUserResponse().get(1)));
-				if (null == game) {
-					tui.observeGameSuccess(false);
-				} else {
-					tui.observeGameSuccess(true);
-					color = (tui.getLastUserResponse().get(0).equals("WHITE")) ?
-						ChessGame.TeamColor.WHITE :
-						ChessGame.TeamColor.BLACK;
-					observing = true;
-					return game;
-				}
+				tui.observeGameSuccess(false);
+				/*
+				 * GameData game = sf.loadGame(List.of(authToken, tui.getLastUserResponse().get(1)));
+				 * if (null == game) {
+					 * tui.observeGameSuccess(false);
+				 * } else {
+					 * tui.observeGameSuccess(true);
+					 * color = (tui.getLastUserResponse().get(0).equals("WHITE")) ?
+						 * ChessGame.TeamColor.WHITE :
+						 * ChessGame.TeamColor.BLACK;
+					 * observing = true;
+					 * return game;
+				 * }
+				 */
 			}
 
 			case "logout" -> {
@@ -177,15 +180,17 @@ public class Client {
 	private void play() {
 		GameTui tui = new GameTui(auth.username());
 		tui.display(game, color, observing);
-		while (true) {
-			GameData loadedGame = sf.getGame(game.gameID());
-			if (!(game.equals(loadedGame)) && null != loadedGame) {
-				game = loadedGame;
-				tui.display(game, color, observing);
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {}
-		}
+		/*
+		 * while (true) {
+			 * GameData loadedGame = sf.getGame(game.gameID());
+			 * if (!(game.equals(loadedGame)) && null != loadedGame) {
+				 * game = loadedGame;
+				 * tui.display(game, color, observing);
+			 * }
+			 * try {
+				 * Thread.sleep(1000);
+			 * } catch (InterruptedException e) {}
+		 * }
+		 */
 	}
 }
