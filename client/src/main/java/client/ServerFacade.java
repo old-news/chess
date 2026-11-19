@@ -31,11 +31,6 @@ public class ServerFacade {
 		url = String.format("http://localhost:%d/", p);
 		httpClient = HttpClient.newHttpClient();
 		serializer = new Gson().newBuilder().serializeNulls().enableComplexMapKeySerialization().create();
-		// serializer = new Gson();
-	}
-
-	public void stop() {
-		return;
 	}
 
 	private String sendReqJson(HttpRequest req) {
